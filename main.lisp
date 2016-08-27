@@ -14,13 +14,13 @@
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
-    (enter (make-instance 'space-axes) scene)
+    (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen) scene)
     (enter (make-instance 'following-camera :name :camera
                                             :target (unit :player scene)
                                             :location (vec 0 100 150)) scene)
-    (enter (make-instance 'bush) scene)
-    (enter (make-instance 'tree :location (vec 20 0 20)) scene)
+    (enter (make-instance 'bush :location (vec -50 0 -50)) scene)
+    (enter (make-instance 'tree :location (vec 100 0 100)) scene)
     (enter (make-instance 'ground) scene)))
 
 (defun launch ()

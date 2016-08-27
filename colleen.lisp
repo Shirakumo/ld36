@@ -72,11 +72,9 @@
 (define-asset texture colleen-walking (:ld36)
   :file "colleen-walking.png")
 
-(define-subject colleen (sprite-subject rotated-entity pivoted-entity)
-  ((velocity :initarg :velocity :accessor velocity)
-   (facing :initarg :facing :accessor facing))
+(define-subject colleen (sprite-subject rotated-entity collidable pivoted-entity)
+  ((facing :initarg :facing :accessor facing))
   (:default-initargs
-   :velocity (vec 0 0 0)
    :location (vec 0 0 0)
    :bounds (vec 50 80 1)
    :pivot (vec -25 0 0.5)
@@ -105,13 +103,19 @@
     
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
-    
+
+    (do-container-tree (item *loop*)
+      (when (and (not (eql item colleen))
+                 (typep item 'collidable)
+                 (collides colleen item))
+        (setf velocity (vec 0 0 0))))
+
     (nv+ location velocity)
 
-    (let* ((ang (* (/ angle 180) PI))
-           (vec (nvrot (vec -1 0 0) (vec 0 1 0) ang)))
-      (when (< 0.01 (abs (- (vx vec) (ecase facing (:left -1) (:right 1)))))
-        (incf angle 20)))
+    ;; (let* ((ang (* (/ angle 180) PI))
+    ;;        (vec (nvrot (vec -1 0 0) (vec 0 1 0) ang)))
+    ;;   (when (< 0.01 (abs (- (vx vec) (ecase facing (:left -1) (:right 1)))))
+    ;;     (incf angle 20)))
 
     (when (< (vy location) 0)
       (setf (vy location) 0)
