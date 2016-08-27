@@ -7,7 +7,8 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(defclass moving-entity (located-entity)
+;; Not necessary, but convenient because it compile-time defines.
+(define-subject moving-entity (located-entity)
   ((velocity :initarg :velocity :initform (vec 0 0 0) :accessor velocity)))
 
 ;; Not great to make every collidable moving, but simplifies things.
