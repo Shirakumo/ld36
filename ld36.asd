@@ -15,7 +15,9 @@
   :serial T
   :defsystem-depends-on (:qtools)
   :components ((:file "package")
-               (:file "main"))
+               (:file "main")
+               (:file "colleen")
+               (:file "items"))
   :depends-on (:trial)
   :build-operation "qt-program-op"
   :build-pathname "ld36"
