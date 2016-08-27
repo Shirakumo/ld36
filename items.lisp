@@ -7,38 +7,46 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(defclass item (textured-entity)
-  ())
+(define-subject item (face-entity collidable)
+  ()
+  (:default-initargs
+   :bounds (vec 20 20 20)))
 
-(defmethod use ((item item)))
+(defmethod paint :around ((item item) (hud hud))
+  (with-pushed-matrix
+    (gl:scale 5/2 5/2 5/2)
+    (call-next-method)))
 
-(defmethod paint ((item item) target)
-  (gl:color 1.0 1.0 1.0)
-  (with-primitives :quads
-    (gl:tex-coord 0 0)
-    (gl:vertex 0 50)
-    (gl:tex-coord 0 1)
-    (gl:vertex 50 50)
-    (gl:tex-coord 1 1)
-    (gl:vertex 50 0)
-    (gl:tex-coord 1 0)
-    (gl:vertex 0 0)))
+(defmethod use ((item item) player))
+
+(defmethod interact ((item item) player)
+  ;; bad.
+  (leave item (scene (window :main)))
+  (enter item (inventory player)))
+
+(define-handler (item tick) (ev)
+  (cond ((<= (vy (location item)) 0)
+         (setf (vy (location item)) 0)
+         (vsetf (velocity item) 0 0 0))
+        (T
+         (decf (vy (velocity item)) 0.5)
+         (nv+ (location item) (velocity item)))))
 
 (define-asset texture stick (:ld36)
   :file "stick.png")
 
-(defclass stick (item)
+(define-subject stick (item)
   ()
   (:default-initargs
    :texture '(:ld36 stick)))
 
-(defmethod use ((stick stick))
+(defmethod use ((stick stick) player)
   )
 
 (define-asset texture pebble (:ld36)
   :file "pebble.png")
 
-(defclass pebble (item)
+(define-subject pebble (item)
   ()
   (:default-initargs
    :texture '(:ld36 pebble)))

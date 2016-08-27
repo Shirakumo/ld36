@@ -56,6 +56,23 @@
   (key-press (one-of key :space))
   (gamepad-press (eql button :a)))
 
+(define-action use (player-action)
+  (mouse-press (one-of button :left))
+  (key-press (one-of key :e))
+  (gamepad-press (eql button :b)))
+
+(define-action drop (player-action)
+  (key-press (one-of key :q))
+  (gamepad-press (eql button :y)))
+
+(define-action inventory-next (player-action)
+  (mouse-scroll (<= 1 delta))
+  (gamepad-press (eql button :r1)))
+
+(define-action inventory-prev (player-action)
+  (mouse-scroll (<= delta -1))
+  (gamepad-press (eql button :l1)))
+
 (define-retention movement (ev)
   (typecase ev
     (start-left (setf (retained 'movement :left) T))
@@ -140,3 +157,23 @@
 (define-handler (colleen perform) (ev)
   (when (interactable colleen)
     (interact (interactable colleen) colleen)))
+
+(define-handler (colleen use) (ev)
+  (let* ((item (item (inventory colleen))))
+    (when item
+      (use item colleen))))
+
+(define-handler (colleen drop) (ev)
+  (let ((item (remove-item (inventory colleen))))
+    (when item
+      (setf (location item) (nv+ (vec 0 50 0) (location colleen)))
+      (setf (velocity item) (vec (- (random 4.0) 2.0)
+                                 (random 10.0)
+                                 (- (random 4.0) 2.0)))
+      (enter item *loop*))))
+
+(define-handler (colleen inventory-next) (ev)
+  (select-next (inventory colleen)))
+
+(define-handler (colleen inventory-prev) (ev)
+  (select-prev (inventory colleen)))

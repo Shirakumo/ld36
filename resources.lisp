@@ -7,6 +7,8 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
+(defmethod interact (a b))
+
 (define-subject resource (collidable)
   ())
 
@@ -67,20 +69,21 @@
          (loc (location (unit :player (scene (window :main)))))
          (zoff (/ (mod (vx loc) size) size))
          (xoff (/ (mod (vz loc) size) size)))
-    (gl:translate (vx loc) (vy loc) (vz loc))
-    (gl:fog :fog-mode :linear)
-    (gl:fog :fog-color (list 1.0 1.0 1.0 1.0))
-    (gl:fog :fog-density 0.1)
-    (gl:fog :fog-start 10.0)
-    (gl:fog :fog-end size)
-    (gl:enable :fog)
-    
-    (with-primitives :quads
-      (gl:tex-coord (+ xoff 0) (+ zoff 0))
-      (gl:vertex (- size) -0.5 (- size))
-      (gl:tex-coord (+ xoff 2) (+ zoff 0))
-      (gl:vertex (- size) -0.5 (+ size))
-      (gl:tex-coord (+ xoff 2) (+ zoff 2))
-      (gl:vertex (+ size) -0.5 (+ size))
-      (gl:tex-coord (+ xoff 0) (+ zoff 2))
-      (gl:vertex (+ size) -0.5 (- size)))))
+    (with-pushed-matrix
+      (gl:translate (vx loc) (vy loc) (vz loc))
+      (gl:fog :fog-mode :linear)
+      (gl:fog :fog-color (list 1.0 1.0 1.0 1.0))
+      (gl:fog :fog-density 0.1)
+      (gl:fog :fog-start 10.0)
+      (gl:fog :fog-end size)
+      (gl:enable :fog)
+      
+      (with-primitives :quads
+        (gl:tex-coord (+ xoff 0) (+ zoff 0))
+        (gl:vertex (- size) -0.5 (- size))
+        (gl:tex-coord (+ xoff 2) (+ zoff 0))
+        (gl:vertex (- size) -0.5 (+ size))
+        (gl:tex-coord (+ xoff 2) (+ zoff 2))
+        (gl:vertex (+ size) -0.5 (+ size))
+        (gl:tex-coord (+ xoff 0) (+ zoff 2))
+        (gl:vertex (+ size) -0.5 (- size))))))

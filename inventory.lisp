@@ -7,19 +7,6 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-action use (player-action)
-  (mouse-press (one-of button :left))
-  (key-press (one-of key :e))
-  (gamepad-press (eql button :b)))
-
-(define-action inventory-next (player-action)
-  (mouse-scroll (<= 1 delta))
-  (gamepad-press (eql button :r1)))
-
-(define-action inventory-prev (player-action)
-  (mouse-scroll (<= delta -1))
-  (gamepad-press (eql button :l1)))
-
 (define-asset texture selected-item (:ld36)
   :file "inventory.png"
   :wrapping :repeat)
@@ -36,6 +23,7 @@
   (enter (make-instance name) inventory))
 
 (defmethod enter ((item item) (inventory inventory))
+  (vsetf (location item) 0 0 0)
   (pushnew item (items inventory)))
 
 (defmethod leave ((item item) (inventory inventory))
@@ -63,13 +51,20 @@
              (paint item hud)
              (gl:translate s 0 0))))
 
-(define-handler (inventory use) (ev)
-  (let ((item (elt (items inventory) (index inventory))))
-    (when item
-      (use item))))
-
-(define-handler (inventory inventory-next) (ev)
+(defmethod select-next ((inventory inventory))
   (setf (index inventory) (mod (1+ (index inventory)) (length (items inventory)))))
 
-(define-handler (inventory inventory-prev) (ev)
+(defmethod select-prev ((inventory inventory))
   (setf (index inventory) (mod (1- (index inventory)) (length (items inventory)))))
+
+(defmethod item ((inventory inventory) &optional (index (index inventory)))
+  (when (< -1 index (length (items inventory)))
+    (nth index (items inventory))))
+
+(defmethod remove-item ((inventory inventory) &optional (index (index inventory)))
+  (when (< -1 index (length (items inventory)))
+    (let ((item (elt (items inventory) index)))
+      (leave item inventory)
+      (when (and (<= 1 (length (items inventory)) (index inventory)))
+        (decf (index inventory)))
+      item)))
