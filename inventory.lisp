@@ -8,8 +8,7 @@
 (in-readtable :qtools)
 
 (define-asset texture selected-item (:ld36)
-  :file "inventory.png"
-  :wrapping :repeat)
+  :file "inventory.png")
 
 (define-subject inventory (hud-entity unsavable)
   ((items :initform () :accessor items)
@@ -32,24 +31,24 @@
 (defmethod paint ((inventory inventory) (hud hud))
   (let ((h (height hud))
         (s 50)
-        (p 5)
-        (num (length (items inventory))))
-    (gl:translate p (- h s p) 0)
-    (loop for item in (items inventory)
-          for i from 0
-          do (when (= i (index inventory))
-               (gl:bind-texture :texture-2d (data (invbg inventory)))
-               (with-primitives :quads
-                 (gl:tex-coord 0 0)
-                 (gl:vertex (- p) (- p))
-                 (gl:tex-coord 1 0)
-                 (gl:vertex (+ s p) (- p))
-                 (gl:tex-coord 1 1)
-                 (gl:vertex (+ s p) (+ s p))
-                 (gl:tex-coord 0 1)
-                 (gl:vertex (- p) (+ s p))))
-             (paint item hud)
-             (gl:translate s 0 0))))
+        (p 5))
+    (with-pushed-matrix
+      (gl:translate p (- h s p) 0)
+      (loop for item in (items inventory)
+            for i from 0
+            do (when (= i (index inventory))
+                 (gl:bind-texture :texture-2d (data (invbg inventory)))
+                 (with-primitives :quads
+                   (gl:tex-coord 0 0)
+                   (gl:vertex 0 0)
+                   (gl:tex-coord 1 0)
+                   (gl:vertex s 0)
+                   (gl:tex-coord 1 1)
+                   (gl:vertex s s)
+                   (gl:tex-coord 0 1)
+                   (gl:vertex 0 s)))
+               (paint item hud)
+               (gl:translate s 0 0)))))
 
 (defmethod select-next ((inventory inventory))
   (setf (index inventory) (mod (1+ (index inventory)) (length (items inventory)))))

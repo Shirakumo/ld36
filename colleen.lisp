@@ -66,10 +66,12 @@
   (gamepad-press (eql button :y)))
 
 (define-action inventory-next (player-action)
+  (key-press (one-of key :2))
   (mouse-scroll (<= 1 delta))
   (gamepad-press (eql button :r1)))
 
 (define-action inventory-prev (player-action)
+  (key-press (one-of key :1))
   (mouse-scroll (<= delta -1))
   (gamepad-press (eql button :l1)))
 
