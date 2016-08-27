@@ -7,44 +7,27 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(defclass inventory-item (textured-entity)
-  ())
-
-(defmethod use ((item inventory-item)))
-
-(defmethod paint ((item inventory-item) (hud hud))
-  (gl:color 1.0 1.0 1.0)
-  (with-primitives :quads
-    (gl:tex-coord 0 0)
-    (gl:vertex 0 50)
-    (gl:tex-coord 0 1)
-    (gl:vertex 50 50)
-    (gl:tex-coord 1 1)
-    (gl:vertex 50 0)
-    (gl:tex-coord 1 0)
-    (gl:vertex 0 0)))
-
 (define-action use (player-action)
   (mouse-press (one-of button :left))
   (key-press (one-of key :e))
   (gamepad-press (eql button :b)))
 
 (define-action inventory-next (player-action)
-  (mouse-scroll (< delta 0))
+  (mouse-scroll (<= 1 delta))
   (gamepad-press (eql button :r1)))
 
 (define-action inventory-prev (player-action)
-  (mouse-scroll (< 0 delta))
+  (mouse-scroll (<= delta -1))
   (gamepad-press (eql button :l1)))
 
-(define-asset texture inventory-item (:ld36)
+(define-asset texture selected-item (:ld36)
   :file "inventory.png"
   :wrapping :repeat)
 
 (define-subject inventory (hud-entity unsavable)
   ((items :initform () :accessor items)
    (index :initarg :index :initform 0 :accessor index)
-   (invbg :initform (get-resource 'texture :ld36 'inventory-item) :reader invbg)))
+   (invbg :initform (get-resource 'texture :ld36 'selected-item) :reader invbg)))
 
 (defmethod initialize-instance :after ((inventory inventory) &key items)
   (dolist (item items) (enter item inventory)))
@@ -52,10 +35,10 @@
 (defmethod enter ((name symbol) (inventory inventory))
   (enter (make-instance name) inventory))
 
-(defmethod enter ((item inventory-item) (inventory inventory))
+(defmethod enter ((item item) (inventory inventory))
   (pushnew item (items inventory)))
 
-(defmethod leave ((item inventory-item) (inventory inventory))
+(defmethod leave ((item item) (inventory inventory))
   (setf (items inventory) (remove item (items inventory))))
 
 (defmethod paint ((inventory inventory) (hud hud))
@@ -86,27 +69,7 @@
       (use item))))
 
 (define-handler (inventory inventory-next) (ev)
-  (v:info :test "~a ~a" (mod (1+ (index inventory)) (length (items inventory))) (length (items inventory)))
   (setf (index inventory) (mod (1+ (index inventory)) (length (items inventory)))))
 
 (define-handler (inventory inventory-prev) (ev)
   (setf (index inventory) (mod (1- (index inventory)) (length (items inventory)))))
-
-(define-asset texture stick (:ld36)
-  :file "stick.png")
-
-(defclass stick (inventory-item)
-  ()
-  (:default-initargs
-   :texture '(:ld36 stick)))
-
-(defmethod use ((stick stick))
-  )
-
-(define-asset texture pebble (:ld36)
-  :file "pebble.png")
-
-(defclass pebble (inventory-item)
-  ()
-  (:default-initargs
-   :texture '(:ld36 pebble)))

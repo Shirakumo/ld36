@@ -18,6 +18,7 @@
                (:file "main")
                (:file "collision")
                (:file "resources")
+               (:file "items")
                (:file "inventory")
                (:file "colleen"))
   :depends-on (:trial)
