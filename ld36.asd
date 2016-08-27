@@ -16,7 +16,9 @@
   :defsystem-depends-on (:qtools)
   :components ((:file "package")
                (:file "main")
+               (:file "collision")
                (:file "items")
+               (:file "inventory")
                (:file "colleen"))
   :depends-on (:trial)
   :build-operation "qt-program-op"
