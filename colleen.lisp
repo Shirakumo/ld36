@@ -52,6 +52,7 @@
   (gamepad-move (one-of axis :left-v :dpad-v) (< pos 0.2 old-pos)))
 
 (define-action perform (player-action)
+  (mouse-press (one-of button :right))
   (key-press (one-of key :space))
   (gamepad-press (eql button :a)))
 
@@ -74,7 +75,8 @@
 
 (define-subject colleen (sprite-subject collidable rotated-entity pivoted-entity)
   ((facing :initarg :facing :accessor facing)
-   (inventory :initform NIL :accessor inventory))
+   (inventory :initform NIL :accessor inventory)
+   (interactable :initform NIL :accessor interactable))
   (:default-initargs
    :location (vec 0 0 0)
    :bounds (vec 50 80 1)
@@ -114,16 +116,15 @@
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
 
-    (let ((interactable (cons most-positive-single-float NIL)))
+    (let ((found (cons most-positive-single-float NIL)))
       (do-container-tree (item *loop*)
         (when (and (not (eql item colleen))
                    (typep item 'collidable))
           (let ((time (collides colleen item)))
-            (when (and time (< time (car interactable)))
-              (setf (car interactable) time
-                    (cdr interactable) item)))))
-      (when (cdr interactable)
-        (v:info :test "Can interact with ~a" (cdr interactable))))
+            (when (and time (< time (car found)))
+              (setf (car found) time
+                    (cdr found) item)))))
+      (setf (interactable colleen) (cdr found)))
 
     (nv+ location velocity)
 
@@ -137,5 +138,5 @@
       (setf (vy velocity) 0))))
 
 (define-handler (colleen perform) (ev)
-  (when (= 0 (vy (location colleen)))
-    (setf (vy (velocity colleen)) 5)))
+  (when (interactable colleen)
+    (interact (interactable colleen) colleen)))
