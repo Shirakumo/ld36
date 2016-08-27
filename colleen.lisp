@@ -74,7 +74,7 @@
 
 (define-subject colleen (sprite-subject collidable rotated-entity pivoted-entity)
   ((facing :initarg :facing :accessor facing)
-   (inventory :initarg :inventory :initform () :accessor inventory))
+   (inventory :initform NIL :accessor inventory))
   (:default-initargs
    :location (vec 0 0 0)
    :bounds (vec 50 80 1)
@@ -83,6 +83,15 @@
    :name :player
    :animations '((idle 2.0 20 :texture (:ld36 colleen-idle))
                  (walk 0.7 20 :texture (:ld36 colleen-walking)))))
+
+(defmethod initialize-instance :after ((colleen colleen) &key inventory)
+  (setf (inventory colleen) (make-instance 'inventory :items inventory)))
+
+(defmethod enter :after ((colleen colleen) (scene scene))
+  (enter (inventory colleen) scene))
+
+(defmethod leave :after ((colleen colleen) (scene scene))
+  (leave (inventory colleen) scene))
 
 (define-handler (colleen tick) (ev)
   (with-slots (facing velocity location angle) colleen
@@ -130,6 +139,3 @@
 (define-handler (colleen perform) (ev)
   (when (= 0 (vy (location colleen)))
     (setf (vy (velocity colleen)) 5)))
-
-(defmethod paint ((colleen colleen) target)
-  (call-next-method))
