@@ -20,7 +20,8 @@
                                             :target (unit :player scene)
                                             :location (vec 0 100 150)) scene)
     (enter (make-instance 'bush) scene)
-    (enter (make-instance 'tree :location (vec 20 0 20)) scene)))
+    (enter (make-instance 'tree :location (vec 20 0 20)) scene)
+    (enter (make-instance 'ground) scene)))
 
 (defun launch ()
   (trial:launch 'main))
