@@ -9,6 +9,6 @@
   (:nicknames #:org.shirakumo.fraf.ld36)
   (:use #:cl+qt #:trial)
   (:shadowing-import-from #:flare #:slot)
-  (:shadow #:launch #:main)
+  (:shadow #:launch #:main #:resource)
   (:export #:launch))
 

@@ -17,7 +17,7 @@
   :components ((:file "package")
                (:file "main")
                (:file "collision")
-               (:file "items")
+               (:file "resources")
                (:file "inventory")
                (:file "colleen"))
   :depends-on (:trial)

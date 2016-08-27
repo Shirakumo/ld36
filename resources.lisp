@@ -7,22 +7,22 @@
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-subject item (collidable)
+(define-subject resource (collidable)
   ())
 
-(defmethod initialize-instance :after ((item item) &key pivot bounds)
+(defmethod initialize-instance :after ((resource resource) &key pivot bounds)
   (when (and bounds (not pivot))
-    (setf (pivot item) (vec (- (/ (vx (bounds item)) 2)) 0
-                            (- (/ (vz (bounds item)) 2))))))
+    (setf (pivot resource) (vec (- (/ (vx (bounds resource)) 2)) 0
+                            (- (/ (vz (bounds resource)) 2))))))
 
-(defmethod paint ((item item) target)
+(defmethod paint ((resource resource) target)
   (with-pushed-matrix
-    (gl:translate 0 0 (- (vz (pivot item))))
+    (gl:translate 0 0 (- (vz (pivot resource))))
     (call-next-method)))
 
 #+nil
-(defmethod paint :after ((item item) target)
-  (let ((bounds (bounds item)))
+(defmethod paint :after ((resource resource) target)
+  (let ((bounds (bounds resource)))
     (gl:disable :texture-2d)
     (gl:color 1.0 1.0 1.0 1.0)
     (with-primitives :quads
@@ -35,7 +35,7 @@
 (define-asset texture bush (:ld36)
   :file "bush.png")
 
-(define-subject bush (item face-entity)
+(define-subject bush (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 40 40 10)
@@ -44,11 +44,14 @@
 (define-asset texture tree (:ld36)
   :file "tree.png")
 
-(define-subject tree (item face-entity)
+(define-subject tree (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 40 150 10)
    :texture '(:ld36 tree)))
+
+(defmethod interact ((tree tree) player)
+  (enter 'stick (inventory player)))
 
 (define-asset texture ground (:ld36)
   :file "ground.png"
