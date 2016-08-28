@@ -90,10 +90,12 @@
                (gl:translate s 0 0)))))
 
 (defmethod select-next ((inventory inventory))
-  (setf (index inventory) (mod (1+ (index inventory)) (length (items inventory)))))
+  (when (< 0 (length (items inventory)))
+    (setf (index inventory) (mod (1+ (index inventory)) (length (items inventory))))))
 
 (defmethod select-prev ((inventory inventory))
-  (setf (index inventory) (mod (1- (index inventory)) (length (items inventory)))))
+  (when (< 0 (length (items inventory)))
+    (setf (index inventory) (mod (1- (index inventory)) (length (items inventory))))))
 
 (defmethod item ((inventory inventory) &optional (index (index inventory)))
   (when (< -1 index (length (items inventory)))
