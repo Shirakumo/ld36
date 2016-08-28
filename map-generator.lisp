@@ -57,22 +57,22 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                width height (- (internal-time-millis) start))
         locations))))
 
-(defmethod populate-scene ((genmap noise-map) (scene scene) objects &optional (tile-size 25))
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (tile-size 25) (zones '(225 50)))
   (let ((start (internal-time-millis))
         (locations)
         (horiz-offset (floor (/ (width genmap) 2)))
         (depth-offset (floor (/ (height genmap) 2))))
     (for:for ((object in objects)
               (counter repeat (length objects)))
-      ;; 100 and 150 give quite nice results, might try others too.
+      ;; 170 give quite nice results, might try others too.
       ;; Basically 128 is highest chance to appear but tends to bunch things together.
-      (let ((object-locations (locations genmap '(100 150) :filter-locations locations)))
+      (let ((object-locations (locations genmap zones :filter-locations locations)))
         (for:for ((location in object-locations))
           (let ((x (* (- (car location) horiz-offset) tile-size))
                 (z (* (- (cdr location) depth-offset) tile-size)))
             (enter (make-instance object :location (vec x 0 z)) scene))
-          ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
+      ;; Regenerate to set different kinds of formations for different objects
       (when (< (1+ counter) (length objects))
         (regenerate genmap)))
     (v:log :info :map-generator "Adding objects to the map of size (~a x ~a) took ~a ms."
