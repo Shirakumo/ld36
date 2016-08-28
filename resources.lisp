@@ -109,7 +109,8 @@
                    (pebble 5))))
 
 (defmethod interact ((fireplace fireplace) player)
-  (setf (burning fireplace) (not (burning fireplace))))
+  (when (built fireplace)
+    (setf (burning fireplace) (not (burning fireplace)))))
 
 (defun random-range (range)
   (- (random (* 2.0 range)) range))
