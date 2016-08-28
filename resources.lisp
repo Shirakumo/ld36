@@ -16,7 +16,8 @@
 (defmethod initialize-instance :after ((resource resource) &key pivot bounds)
   (when (and bounds (not pivot))
     (setf (pivot resource) (vec (- (/ (vx (bounds resource)) 2)) 0
-                            (- (/ (vz (bounds resource)) 2))))))
+                                (- (/ (vz (bounds resource)) 2)))))
+  (nv- (location resource) 1))
 
 (defmethod paint ((resource resource) target)
   (with-pushed-matrix
@@ -35,23 +36,49 @@
       (gl:vertex (vx bounds) 0 0))
     (gl:enable :texture-2d)))
 
+(define-asset texture flower (:ld36)
+  :file "flower.png")
+
+(define-subject flower (resource face-entity)
+  ()
+  (:default-initargs
+   :bounds (vec 40 40 20)
+   :texture '(:ld36 flower)))
+
+(define-asset texture grass (:ld36)
+  :file "grass.png")
+
+(define-subject grass (resource face-entity)
+  ()
+  (:default-initargs
+   :bounds (vec 40 40 20)
+   :texture '(:ld36 grass)))
+
 (define-asset texture bush (:ld36)
   :file "bush.png")
+
+(define-asset texture bush2 (:ld36)
+  :file "bush2.png")
 
 (define-subject bush (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 40 40 20)
-   :texture '(:ld36 bush)))
+   :texture (alexandria:random-elt '((:ld36 bush)
+                                     (:ld36 bush2)))))
 
 (define-asset texture tree (:ld36)
   :file "tree.png")
+
+(define-asset texture tree2 (:ld36)
+  :file "tree2.png")
 
 (define-subject tree (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 40 150 20)
-   :texture '(:ld36 tree)))
+   :texture (alexandria:random-elt '((:ld36 tree)
+                                     (:ld36 tree2)))))
 
 (defmethod interact ((tree tree) player)
   (enter 'stick (inventory player)))
@@ -59,11 +86,15 @@
 (define-asset texture rock (:ld36)
   :file "rock.png")
 
+(define-asset texture rock2 (:ld36)
+  :file "rock2.png")
+
 (define-subject rock (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 60 60 40)
-   :texture '(:ld36 rock)))
+   :texture (alexandria:random-elt '((:ld36 rock)
+                                     (:ld36 rock2)))))
 
 (defmethod interact ((rock rock) player)
   (enter 'pebble (inventory player)))
