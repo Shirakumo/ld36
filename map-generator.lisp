@@ -69,8 +69,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                 (z (- (second location) depth-offset)))
             (enter (make-instance object :location (vec x 0 z)) scene))
           ;; Regenerate to set different kinds of formations for different objects
-          (regenerate genmap)
-          (nconc locations object-locations))))))
+          (nconc locations object-locations)))
+      (regenerate genmap))))
 
 
 (defun blend-maps (&rest maps)
