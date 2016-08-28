@@ -17,8 +17,6 @@
     (gl:scale 5/2 5/2 5/2)
     (call-next-method)))
 
-(defmethod use ((item item) player))
-
 (defmethod interact ((item item) player)
   ;; bad.
   (leave item (scene (window :main)))
@@ -39,9 +37,6 @@
   ()
   (:default-initargs
    :texture '(:ld36 stick)))
-
-(defmethod use ((stick stick) player)
-  )
 
 (define-asset texture pebble (:ld36)
   :file "pebble.png")
