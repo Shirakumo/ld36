@@ -14,26 +14,32 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 
 (defclass noise-map ()
   ((noise-map :initform NIL :accessor noise-map)
-   (octave :initform NIL :accessor octave)))
+   (octave :initform NIL :accessor octave)
+   (width :initarg :width :accessor width)
+   (height :initarg :height :accessor height )))
 
-(defmethod initialize-instance :after ((genmap noise-map) &key (octave 3) width height)
+(defmethod initialize-instance :after ((genmap noise-map) &key (octave 3))
   (setf (octave genmap) octave)
-  (regenerate genmap width height))
+  (regenerate genmap (width genmap) (height genmap)))
 
-(defmethod regenerate ((genmap noise-map) width height)
-  (let ((start (internal-time-millis)))
-    (let ((map (gen-noise-map width height (octave genmap))))
-      (setf (noise-map genmap) map)
-      (v:log :debug :map-generator "Generation of the map with octave (~a), and size (~a x ~a) took ~a ms."
-             (octave genmap) width height (- (internal-time-millis) start)))))
+(defmethod regenerate ((genmap noise-map) &optional (width -1) (height -1))
+  (let* ((start (internal-time-millis))
+         (width (if (<= 0 width) width (width genmap)))
+         (height (if (<= 0 height) height (height genmap)))
+         (map (gen-noise-map width height (octave genmap))))
+    (setf (noise-map genmap) map
+          (width genmap) width
+          (height genmap) height)
+    (v:log :debug :map-generator "Generation of the map with octave (~a), and size (~a x ~a) took ~a ms."
+           (octave genmap) width height (- (internal-time-millis) start))))
 
 (defmethod locations ((genmap noise-map) zones &key (cluster-size 10) (min-distance 1) filter-locations)
   ;; TODO: instead of defining zones by [0,255] value, use keywords like "rare" and "common", or perhaps a 0-10 scale
   (let ((map (noise-map genmap)))
     (when map
       (let* ((start (internal-time-millis))
-             (width (first (array-dimensions map)))
-             (height (second (array-dimensions map)))
+             (width (width genmap))
+             (height (height genmap))
              (locations))
         (dotimes (x width)
           (dotimes (y height)
@@ -49,6 +55,22 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (v:log :debug :map-generator "Fetching locations for a map of size (~a x ~a) took ~a ms."
                width height (- (internal-time-millis) start))
         locations))))
+
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects)
+  (let ((locations)
+        (horiz-offset (floor (/ (width genmap) 2)))
+        (depth-offset (floor (/ (height genmap) 2))))
+    (for:for ((object in objects))
+      ;; 100 and 150 give quite nice results, might try others too.
+      ;; Basically 128 is highest chance to appear but tends to bunch things together.
+      (let ((object-locations (locations genmap '(100 150) :filter-locations locations)))
+        (for:for ((location in object-locations))
+          (let ((x (- (first location) horiz-offset))
+                (z (- (second location) depth-offset)))
+            (enter (make-instance object :location (vec x 0 z)) scene))
+          ;; Regenerate to set different kinds of formations for different objects
+          (regenerate genmap)
+          (nconc locations object-locations))))))
 
 
 (defun blend-maps (&rest maps)
