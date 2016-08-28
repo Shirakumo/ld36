@@ -76,7 +76,7 @@
 (define-subject tree (resource face-entity)
   ()
   (:default-initargs
-   :bounds (vec 40 150 20)
+   :bounds (vec 40 150 40)
    :texture (alexandria:random-elt '((:ld36 tree)
                                      (:ld36 tree2)))))
 
