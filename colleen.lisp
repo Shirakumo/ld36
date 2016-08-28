@@ -163,7 +163,8 @@
 (define-handler (colleen use) (ev)
   (let* ((item (item (inventory colleen))))
     (when item
-      (use item colleen))))
+      (when (use item (or (interactable colleen) colleen))
+        (leave item (inventory colleen))))))
 
 (define-handler (colleen drop) (ev)
   (let ((item (remove-item (inventory colleen))))
