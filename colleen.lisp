@@ -101,7 +101,8 @@
 (define-subject colleen (sprite-subject collidable rotated-entity pivoted-entity)
   ((facing :initarg :facing :accessor facing)
    (inventory :initform NIL :accessor inventory)
-   (interactable :initform NIL :accessor interactable))
+   (interactable :initform NIL :accessor interactable)
+   (placing :initform NIL :accessor placing))
   (:default-initargs
    :location (vec 0 0 0)
    :bounds (vec 50 80 1)
@@ -123,21 +124,24 @@
   (leave (inventory colleen) scene))
 
 (define-handler (colleen tick) (ev)
-  (with-slots (facing velocity location angle) colleen
+  (with-slots (facing velocity location angle placing) colleen
     (cond ((retained 'movement :left) (setf facing :left))
           ((retained 'movement :right) (setf facing :right)))
     
-    (setf (vx velocity)
-          (cond ((retained 'movement :left) -5)
-                ((retained 'movement :right) 5)
-                (T 0))
-          (vz velocity)
-          (cond ((retained 'movement :up) -5)
-                ((retained 'movement :down) 5)
-                (T 0)))
+    (let ((prevlen (vlength velocity)))
+      (setf (vx velocity)
+            (cond ((retained 'movement :left) -5)
+                  ((retained 'movement :right) 5)
+                  (T 0))
+            (vz velocity)
+            (cond ((retained 'movement :up) -5)
+                  ((retained 'movement :down) 5)
+                  (T 0)))
 
-    (when (< 0 (vlength velocity))
-      (setf (animation colleen) 'walk))
+      (when (< 0 (vlength velocity))
+        (setf (animation colleen) 'walk))
+      (when (and (= 0 (vlength velocity)) (/= 0 prevlen))
+        (setf (animation colleen) 'idle)))
     
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
@@ -145,6 +149,7 @@
     (let ((found (cons most-positive-single-float NIL)))
       (do-container-tree (item *loop*)
         (when (and (not (eql item colleen))
+                   (not (eql item placing))
                    (typep item 'collidable))
           (let ((time (collides colleen item)))
             (when (and time (< time (car found)))
@@ -161,12 +166,19 @@
 
     (when (< (vy location) 0)
       (setf (vy location) 0)
-      (setf (vy velocity) 0))))
+      (setf (vy velocity) 0))
+
+    (when placing
+      (setf (location placing) (v+ location
+                                   (vec (ecase facing (:left -30) (:right 30)) 0 0))))))
 
 (define-handler (colleen perform) (ev)
-  (when (interactable colleen)
-    (setf (animation colleen) 'use)
-    (interact (interactable colleen) colleen)))
+  (when (cond
+          ((placing colleen)
+           (setf (placing colleen) NIL))
+          ((interactable colleen)
+           (interact (interactable colleen) colleen)))
+    (setf (animation colleen) 'use)))
 
 (define-handler (colleen use) (ev)
   (let* ((item (item (inventory colleen))))
@@ -176,21 +188,26 @@
         (leave item (inventory colleen))))))
 
 (define-handler (colleen drop) (ev)
-  (let ((item (remove-item (inventory colleen))))
-    (when item
-      (setf (animation colleen) 'throw)
-      (setf (location item) (nv+ (vec (ecase (facing colleen)
-                                        (:left -30)
-                                        (:right 10))
-                                      40
-                                      0)
-                                 (location colleen)))
-      (setf (velocity item) (vec (ecase (facing colleen)
-                                   (:left (- (random 4.0)))
-                                   (:right (random 4.0)))
-                                 (random 10.0)
-                                 (- (random 4.0) 2.0)))
-      (enter item *loop*))))
+  (cond ((placing colleen)
+         (leave (placing colleen) *loop*)
+         (setf (placing colleen) NIL))
+        (T
+         (let ((item (remove-item (inventory colleen))))
+           (when item
+             (setf (animation colleen) 'throw)
+             (setf (location item) (nv+ (vec (ecase (facing colleen)
+                                               (:left -30)
+                                               (:right 10))
+                                             40
+                                             0)
+                                        (location colleen)))
+             (setf (velocity item) (nv+ (vec (ecase (facing colleen)
+                                               (:left (- (random 4.0)))
+                                               (:right (random 4.0)))
+                                             (random 10.0)
+                                             (- (random 4.0) 2.0))
+                                        (velocity colleen)))
+             (enter item *loop*))))))
 
 (define-handler (colleen inventory-next) (ev)
   (select-next (inventory colleen)))
