@@ -56,7 +56,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                width height (- (internal-time-millis) start))
         locations))))
 
-(defmethod populate-scene ((genmap noise-map) (scene scene) objects)
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects &optional (tile-size 25))
   (let ((locations)
         (horiz-offset (floor (/ (width genmap) 2)))
         (depth-offset (floor (/ (height genmap) 2))))
@@ -65,8 +65,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
       ;; Basically 128 is highest chance to appear but tends to bunch things together.
       (let ((object-locations (locations genmap '(100 150) :filter-locations locations)))
         (for:for ((location in object-locations))
-          (let ((x (- (first location) horiz-offset))
-                (z (- (second location) depth-offset)))
+          (let ((x (* (- (first location) horiz-offset) tile-size))
+                (z (* (- (second location) depth-offset) tile-size)))
             (enter (make-instance object :location (vec x 0 z)) scene))
           ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
