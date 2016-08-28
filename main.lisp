@@ -21,6 +21,8 @@
                                             :location (vec 0 100 150)) scene)
     (enter (make-instance 'bush :location (vec -50 0 -50)) scene)
     (enter (make-instance 'tree :location (vec 100 0 100)) scene)
+    (enter (make-instance 'rock :location (vec -100 0 100)) scene)
+    (enter (make-instance 'fireplace :location (vec 0 0 0)) scene)
     (enter (make-instance 'ground) scene)))
 
 (defun launch ()
