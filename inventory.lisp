@@ -21,12 +21,49 @@
 (defmethod enter ((name symbol) (inventory inventory))
   (enter (make-instance name) inventory))
 
+(defun inv-find-container (item inventory)
+  (find (type-of item) (items inventory) :test (lambda (a b) (typep (elt b 0) a))))
+
 (defmethod enter ((item item) (inventory inventory))
   (vsetf (location item) 0 0 0)
-  (pushnew item (items inventory)))
+  (let ((vec (inv-find-container item inventory)))
+    (if vec
+        (vector-push-extend item vec)
+        (push (make-array 1 :initial-element item :adjustable T :fill-pointer T) (items inventory))))
+  item)
 
 (defmethod leave ((item item) (inventory inventory))
-  (setf (items inventory) (remove item (items inventory))))
+  (let ((vec (inv-find-container item inventory)))
+    (cond ((= 1 (length vec))
+           (setf (items inventory) (remove vec (items inventory)))
+           (when (and (<= 1 (length (items inventory)) (index inventory)))
+             (decf (index inventory)))
+           item)
+          (T
+           (vector-pop vec)))))
+
+(defmethod leave ((index integer) (inventory inventory))
+  (when (< -1 index (length (items inventory)))
+    (let ((item (item inventory index)))
+      (leave item inventory))))
+
+(defun mkcolor (vec)
+  (flet ((fmt (a) (cond ((<= 0 a 1) (round (* 255 a)))
+                        ((< a 0) 0)
+                        ((< 255 a) 255)
+                        (T a))))
+    (q+:make-qcolor (fmt (vx vec)) (fmt (vy vec)) (fmt (vz vec)))))
+
+(defun draw-text (x y text &optional (color (vec 0 0 0)))
+  (with-pushed-attribs T
+    (with-painter (painter *context*)
+      (let ((font (get-resource 'font :trial :debug-hud)))
+        (with-finalizing ((color (mkcolor color)))
+          (setf (q+:render-hint painter) (q+:qpainter.text-antialiasing))
+          (setf (q+:render-hint painter) (q+:qpainter.high-quality-antialiasing))
+          (setf (q+:font painter) (data font))
+          (setf (q+:color (q+:pen painter)) color)
+          (q+:draw-text painter x y text))))))
 
 (defmethod paint ((inventory inventory) (hud hud))
   (let ((h (height hud))
@@ -47,7 +84,8 @@
                    (gl:vertex s s)
                    (gl:tex-coord 0 1)
                    (gl:vertex 0 s)))
-               (paint item hud)
+               (paint (elt item 0) hud)
+               (draw-text (* s (1+ i)) (- h s) (princ-to-string (length item)))
                (gl:translate s 0 0)))))
 
 (defmethod select-next ((inventory inventory))
@@ -58,12 +96,8 @@
 
 (defmethod item ((inventory inventory) &optional (index (index inventory)))
   (when (< -1 index (length (items inventory)))
-    (nth index (items inventory))))
+    (let ((vec (nth index (items inventory))))
+      (when vec (elt vec 0)))))
 
 (defmethod remove-item ((inventory inventory) &optional (index (index inventory)))
-  (when (< -1 index (length (items inventory)))
-    (let ((item (elt (items inventory) index)))
-      (leave item inventory)
-      (when (and (<= 1 (length (items inventory)) (index inventory)))
-        (decf (index inventory)))
-      item)))
+  (leave index inventory))
