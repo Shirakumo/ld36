@@ -62,7 +62,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (locations)
         (horiz-offset (floor (/ (width genmap) 2)))
         (depth-offset (floor (/ (height genmap) 2))))
-    (for:for ((object in objects))
+    (for:for ((object in objects)
+              (counter repeat (length objects)))
       ;; 100 and 150 give quite nice results, might try others too.
       ;; Basically 128 is highest chance to appear but tends to bunch things together.
       (let ((object-locations (locations genmap '(100 150) :filter-locations locations)))
@@ -72,7 +73,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
             (enter (make-instance object :location (vec x 0 z)) scene))
           ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
-      (regenerate genmap))
+      (when (< (1+ counter) (length objects))
+        (regenerate genmap)))
     (v:log :info :map-generator "Adding objects to the map of size (~a x ~a) took ~a ms."
            (width genmap) (height genmap) (- (internal-time-millis) start))))
 
