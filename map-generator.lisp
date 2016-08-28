@@ -70,8 +70,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (for:for ((location in object-locations))
           (let ((x (* (- (car location) horiz-offset) tile-size))
                 (z (* (- (cdr location) depth-offset) tile-size)))
-            (enter (make-instance object :location (vec x 0 z)) scene)
-            (v:log :info :map-generator "Added a ~a to (~a,~a)." object x z))
+            (enter (make-instance object :location (vec x 0 z)) scene))
           ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
       (when (< (1+ counter) (length objects))
@@ -187,9 +186,12 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   (+ (* x0 (- 1.0 alpha)) (* alpha x1)))
 
 (defun is-good-zone (value zones)
-  (let ((fuzzy (* 2 (random 5))))
+  (let ((fuzzy (* 2 (random 6)))
+        (is-good))
     (for:for ((zone in zones))
-      (<= (abs (- value zone)) fuzzy))))
+      (until is-good)
+      (setf is-good (<= (abs (- value zone)) fuzzy)))
+    is-good))
 
 (defun resize-map (map dest-width dest-height)
   (let ((src-width (first (array-dimensions map)))
