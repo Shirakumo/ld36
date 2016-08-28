@@ -40,7 +40,7 @@
              (decf (index inventory)))
            item)
           (T
-           (vector-pop vec)))))
+           (array-utils:vector-pop-front vec)))))
 
 (defmethod leave ((index integer) (inventory inventory))
   (when (< -1 index (length (items inventory)))
@@ -86,7 +86,8 @@
                    (gl:tex-coord 0 1)
                    (gl:vertex 0 s)))
                (paint (elt item 0) hud)
-               (draw-text (* s (1+ i)) (- h s) (princ-to-string (length item)))
+               (unless (typep (elt item 0) 'resource)
+                 (draw-text (* s (1+ i)) (- h s) (princ-to-string (length item))))
                (gl:translate s 0 0)))))
 
 (defmethod select-next ((inventory inventory))

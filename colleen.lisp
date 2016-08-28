@@ -214,3 +214,10 @@
 
 (define-handler (colleen inventory-prev) (ev)
   (select-prev (inventory colleen)))
+
+(defmethod use ((resource resource) (colleen colleen))
+  (unless (placing colleen)
+    (enter resource (scene (window :main)))
+    (setf (placing colleen) resource)
+    (enter (type-of resource) (inventory colleen))
+    T))

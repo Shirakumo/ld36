@@ -18,11 +18,12 @@
                (:file "main")
                (:file "map-generator")
                (:file "collision")
-               (:file "resources")
                (:file "items")
+               (:file "resources")
                (:file "inventory")
                (:file "colleen"))
-  :depends-on (:trial)
+  :depends-on (:trial
+               :array-utils)
   :build-operation "qt-program-op"
   :build-pathname "ld36"
   :entry-point "ld36:launch")

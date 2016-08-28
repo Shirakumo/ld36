@@ -10,7 +10,7 @@
 (defmethod interact (a b))
 (defmethod use (a b))
 
-(define-subject resource (collidable)
+(define-subject resource (item)
   ())
 
 (defmethod initialize-instance :after ((resource resource) &key pivot bounds)
@@ -23,6 +23,13 @@
   (with-pushed-matrix
     (gl:translate 0 0 (- (vz (pivot resource))))
     (call-next-method)))
+
+(defmethod paint ((resource resource) (hud hud))
+  (with-pushed-matrix
+    (gl:translate (- (vx (pivot resource))) 0 0)
+    (call-next-method)))
+
+(defmethod interact ((resource resource) player))
 
 #+nil
 (defmethod paint :after ((resource resource) target)

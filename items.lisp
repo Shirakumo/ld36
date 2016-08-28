@@ -14,7 +14,10 @@
 
 (defmethod paint :around ((item item) (hud hud))
   (with-pushed-matrix
-    (gl:scale 5/2 5/2 5/2)
+    (let ((factor (/ 50 (max (vx (bounds item))
+                             (vy (bounds item))
+                             (vz (bounds item))))))
+      (gl:scale factor factor factor))
     (call-next-method)))
 
 (defmethod interact ((item item) player)
