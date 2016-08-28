@@ -25,7 +25,6 @@
                (:file "critter"))
   :depends-on (:trial
                :array-utils)
->>>>>>> 7458cae... Look at them cats go!
   :build-operation "qt-program-op"
   :build-pathname "ld36"
   :entry-point "ld36:launch")
