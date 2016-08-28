@@ -92,6 +92,12 @@
 (define-asset texture colleen-walking (:ld36)
   :file "colleen-walking.png")
 
+(define-asset texture colleen-using (:ld36)
+  :file "colleen-using.png")
+
+(define-asset texture colleen-throw (:ld36)
+  :file "colleen-throw.png")
+
 (define-subject colleen (sprite-subject collidable rotated-entity pivoted-entity)
   ((facing :initarg :facing :accessor facing)
    (inventory :initform NIL :accessor inventory)
@@ -102,8 +108,10 @@
    :pivot (vec -25 0 0.5)
    :facing :left
    :name :player
-   :animations '((idle 2.0 20 :texture (:ld36 colleen-idle))
-                 (walk 0.7 20 :texture (:ld36 colleen-walking)))))
+   :animations '((idle  2.0 20 :texture (:ld36 colleen-idle))
+                 (walk  0.7 20 :texture (:ld36 colleen-walking) :next idle)
+                 (use   0.7 12 :texture (:ld36 colleen-using) :next idle)
+                 (throw 0.7 12 :texture (:ld36 colleen-throw) :next idle))))
 
 (defmethod initialize-instance :after ((colleen colleen) &key inventory)
   (setf (inventory colleen) (make-instance 'inventory :items inventory)))
@@ -128,9 +136,8 @@
                 ((retained 'movement :down) 5)
                 (T 0)))
 
-    (if (< 0 (vlength velocity))
-        (setf (animation colleen) 'walk)
-        (setf (animation colleen) 'idle))
+    (when (< 0 (vlength velocity))
+      (setf (animation colleen) 'walk))
     
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
@@ -158,19 +165,29 @@
 
 (define-handler (colleen perform) (ev)
   (when (interactable colleen)
+    (setf (animation colleen) 'use)
     (interact (interactable colleen) colleen)))
 
 (define-handler (colleen use) (ev)
   (let* ((item (item (inventory colleen))))
     (when item
       (when (use item (or (interactable colleen) colleen))
+        (setf (animation colleen) 'use)
         (leave item (inventory colleen))))))
 
 (define-handler (colleen drop) (ev)
   (let ((item (remove-item (inventory colleen))))
     (when item
-      (setf (location item) (nv+ (vec 0 50 0) (location colleen)))
-      (setf (velocity item) (vec (- (random 4.0) 2.0)
+      (setf (animation colleen) 'throw)
+      (setf (location item) (nv+ (vec (ecase (facing colleen)
+                                        (:left -30)
+                                        (:right 10))
+                                      40
+                                      0)
+                                 (location colleen)))
+      (setf (velocity item) (vec (ecase (facing colleen)
+                                   (:left (- (random 4.0)))
+                                   (:right (random 4.0)))
                                  (random 10.0)
                                  (- (random 4.0) 2.0)))
       (enter item *loop*))))

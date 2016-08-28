@@ -63,7 +63,7 @@
 (define-subject bush (resource face-entity)
   ()
   (:default-initargs
-   :bounds (vec 40 40 20)
+   :bounds (vec 50 50 20)
    :texture (alexandria:random-elt '((:ld36 bush)
                                      (:ld36 bush2)))))
 
