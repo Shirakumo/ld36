@@ -70,7 +70,8 @@
         (s 50)
         (p 5))
     (with-pushed-matrix
-      (gl:translate p (- h s p) 0)
+      (gl:translate p (- h p) 0)
+      (gl:scale 1 -1 1)
       (loop for item in (items inventory)
             for i from 0
             do (when (= i (index inventory))
