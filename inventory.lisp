@@ -74,7 +74,8 @@
       (gl:scale 1 -1 1)
       (loop for item in (items inventory)
             for i from 0
-            do (when (= i (index inventory))
+            do (paint (elt item 0) hud)
+               (when (= i (index inventory))
                  (gl:bind-texture :texture-2d (data (invbg inventory)))
                  (with-primitives :quads
                    (gl:tex-coord 0 0)
@@ -85,7 +86,6 @@
                    (gl:vertex s s)
                    (gl:tex-coord 0 1)
                    (gl:vertex 0 s)))
-               (paint (elt item 0) hud)
                (unless (typep (elt item 0) 'resource)
                  (draw-text (* s (1+ i)) (- h s) (princ-to-string (length item))))
                (gl:translate s 0 0)))))
