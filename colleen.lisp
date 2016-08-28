@@ -123,6 +123,11 @@
 (defmethod leave :after ((colleen colleen) (scene scene))
   (leave (inventory colleen) scene))
 
+(defun align (vector grid)
+  (vec (* (round (vx vector) (vx grid)) (vx grid))
+       (* (round (vy vector) (vy grid)) (vy grid))
+       (* (round (vz vector) (vz grid)) (vz grid))))
+
 (define-handler (colleen tick) (ev)
   (with-slots (facing velocity location angle placing) colleen
     (cond ((retained 'movement :left) (setf facing :left))
@@ -169,8 +174,8 @@
       (setf (vy velocity) 0))
 
     (when placing
-      (setf (location placing) (v+ location
-                                   (vec (ecase facing (:left -30) (:right 30)) 0 0))))))
+      (let ((maybe-loc (v+ location (vec (ecase facing (:left -30) (:right 30)) 0 0))))
+        (setf (location placing) (align maybe-loc (bounds placing)))))))
 
 (define-handler (colleen perform) (ev)
   (when (cond
