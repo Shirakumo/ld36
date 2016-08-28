@@ -183,7 +183,7 @@
     (with-pushed-matrix
       (gl:translate (vx loc) (vy loc) (vz loc))
       (gl:fog :fog-mode :linear)
-      (gl:fog :fog-color (list 0.0 0.0 0.0 1.0))
+      (gl:fog :fog-color (list 1.0 1.0 1.0 1.0))
       (gl:fog :fog-density 0.1)
       (gl:fog :fog-start 10.0)
       (gl:fog :fog-end size)

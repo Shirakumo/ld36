@@ -10,10 +10,12 @@
 (define-pool :ld36)
 
 (define-widget main (QGLWidget trial:main)
-  ())
+  ()
+  (:default-initargs :clear-color (vec 1 1 1)))
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
+    (enter (make-instance 'ground) scene)
     (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen :inventory '(stick stick)) scene)
     (enter (make-instance 'following-camera :name :camera
