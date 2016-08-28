@@ -25,8 +25,7 @@
     (enter (make-instance 'tree :location (vec 100 0 100)) scene)
     (enter (make-instance 'rock :location (vec -100 0 100)) scene)
     (enter (make-instance 'fireplace :location (vec 0 0 0)) scene)
-    (populate-scene (make-instance 'noise-map :width 200 :height 200) scene '(tree bush))
-    (enter (make-instance 'ground) scene)))
+    (populate-scene (make-instance 'noise-map :width 200 :height 200) scene '(tree bush rock))))
 
 (defun launch ()
   (trial:launch 'main))
