@@ -141,7 +141,8 @@
 
 (defmethod interact ((fireplace fireplace) player)
   (when (built fireplace)
-    (setf (burning fireplace) (not (burning fireplace)))))
+    (setf (burning fireplace) (not (burning fireplace)))
+    T))
 
 (defun random-range (range)
   (- (random (* 2.0 range)) range))
@@ -150,8 +151,8 @@
   (when (burning fireplace)
     (dotimes (i 5)
       (add-particle (part-sys fireplace)
-                    :loc (v- (location fireplace) (pivot fireplace)
-                             (vec (random-range 8) (- (random-range 6) 13) (random-range 1)))
+                    :loc (v- (vec (random-range 8) (+ (random-range 6) 13) (random-range 1))
+                             (pivot fireplace))
                     :vel (vec (random 0.5) (random 0.5) (random 0.5))
                     :col (let ((r (random 0.3)))
                            (vec (+ (random 0.2) 0.8)
