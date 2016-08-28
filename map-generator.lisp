@@ -61,7 +61,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                width height (- (internal-time-millis) start))
         locations))))
 
-(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (zones '(200 50)))
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (zones '(200 50)) object-cap)
   ;; About zones, it takes values between [0,255] where 128 is highest chance to appear.
   (let ((start (internal-time-millis))
         (locations)
@@ -70,8 +70,10 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (depth-offset (floor (/ (height genmap) 2))))
     (for:for ((object in objects)
               (counter repeat (length objects)))
-      (let ((object-locations (locations genmap zones :filter-locations locations)))
+      (let ((object-locations (locations genmap zones :filter-locations locations))
+            (counter 0))
         (for:for ((location in object-locations))
+          (until (and object-cap (< object-cap (incf counter))))
           (let ((x (* (- (car location) horiz-offset) tile-size))
                 (z (* (- (cdr location) depth-offset) tile-size)))
             (enter (make-instance object :location (vec x 0 z)) scene))
