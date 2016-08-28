@@ -16,16 +16,21 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   ((noise-map :initform NIL :accessor noise-map)
    (octave :initform NIL :accessor octave)
    (width :initarg :width :accessor width)
-   (height :initarg :height :accessor height )))
+   (height :initarg :height :accessor height)
+   (tile-size :initarg :tile-size :accessor tile-size))
+  (:default-initargs
+   :tile-size 20))
 
 (defmethod initialize-instance :after ((genmap noise-map) &key (octave 3))
-  (setf (octave genmap) octave)
+  (setf (octave genmap) octave
+        (width genmap) (floor (/ (width genmap) (tile-size genmap)))
+        (height genmap) (floor (/ (height genmap) (tile-size genmap))))
   (regenerate genmap (width genmap) (height genmap)))
 
-(defmethod regenerate ((genmap noise-map) &optional (width -1) (height -1))
+(defmethod regenerate ((genmap noise-map) &optional width height)
   (let* ((start (internal-time-millis))
-         (width (if (<= 0 width) width (width genmap)))
-         (height (if (<= 0 height) height (height genmap)))
+         (width (or width (width genmap)))
+         (height (or height (height genmap)))
          (map (gen-noise-map width height (octave genmap))))
     (setf (noise-map genmap) map
           (width genmap) width
@@ -57,9 +62,10 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                width height (- (internal-time-millis) start))
         locations))))
 
-(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (tile-size 25) (zones '(225 50)))
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (zones '(200 50)))
   (let ((start (internal-time-millis))
         (locations)
+        (tile-size (tile-size genmap))
         (horiz-offset (floor (/ (width genmap) 2)))
         (depth-offset (floor (/ (height genmap) 2))))
     (for:for ((object in objects)
