@@ -7,6 +7,11 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
+(defun internal-time-millis ()
+  (/ (get-internal-real-time)
+     (/ internal-time-units-per-second
+        1000)))
+
 (defclass noise-map ()
   ((noise-map :initform NIL :accessor noise-map)
    (octave :initform NIL :accessor octave)))
@@ -20,7 +25,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
     (let ((map (gen-noise-map width height (octave genmap))))
       (setf (noise-map genmap) map)
       (v:log :debug :map-generator "Generation of the map with octave (~a), and size (~a x ~a) took ~a ms."
-             (octavegenmap ) width height (- (internal-time-millis) start)))))
+             (octave genmap) width height (- (internal-time-millis) start)))))
 
 (defmethod locations ((genmap noise-map) zones &key (cluster-size 10) (min-distance 1) filter-locations)
   ;; TODO: instead of defining zones by [0,255] value, use keywords like "rare" and "common", or perhaps a 0-10 scale
@@ -71,6 +76,19 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
               (incf (aref new-map x y) (aref map x y)))
             (setf (aref new-map x y) (floor (/ (aref new-map x y) (length sized-maps))))))
         new-map))))
+
+(defun count-objects (x y distance locations)
+  (let* ((double-min (1+ (* 2 distance)))
+         (x (- x distance))
+         (y (- y distance))
+         (counter 0))
+    (for:for ((i repeat (* double-min double-min)))
+      (let ((x1 (+ x (mod i double-min)))
+            (y1 (+ y (floor (/ i double-min)))))
+        (for:for ((loc in locations))
+          (when (and (= x1 (car loc)) (= y1 (cdr loc)))
+            (incf counter)))))
+    counter))
 
 (defun gen-noise-map (width height octave)
   (let ((width (1+ width))
