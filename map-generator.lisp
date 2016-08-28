@@ -30,7 +30,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
     (setf (noise-map genmap) map
           (width genmap) width
           (height genmap) height)
-    (v:log :debug :map-generator "Generation of the map with octave (~a), and size (~a x ~a) took ~a ms."
+    (v:log :info :map-generator "Generation of the map with octave (~a), and size (~a x ~a) took ~a ms."
            (octave genmap) width height (- (internal-time-millis) start))))
 
 (defmethod locations ((genmap noise-map) zones &key (cluster-size 10) (min-distance 1) filter-locations)
@@ -45,14 +45,15 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
           (dotimes (y height)
             (let ((value (aref map x y))
                   (filters (append locations filter-locations)))
-              (when (and (< (count-objects x y min-distance filters) 1)
+              (when (and (is-good-zone value zones)
+                         (< (count-objects x y min-distance filters) 1)
                          (< (count-objects x y
                                            (ceiling (/ (+ min-distance cluster-size) 2))
                                            filters)
                             cluster-size)
                          (< (random 10) 5))
                 (push (cons x y) locations)))))
-        (v:log :debug :map-generator "Fetching locations for a map of size (~a x ~a) took ~a ms."
+        (v:log :info :map-generator "Fetching locations for a map of size (~a x ~a) took ~a ms."
                width height (- (internal-time-millis) start))
         locations))))
 
@@ -65,8 +66,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
       ;; Basically 128 is highest chance to appear but tends to bunch things together.
       (let ((object-locations (locations genmap '(100 150) :filter-locations locations)))
         (for:for ((location in object-locations))
-          (let ((x (* (- (first location) horiz-offset) tile-size))
-                (z (* (- (second location) depth-offset) tile-size)))
+          (let ((x (* (- (car location) horiz-offset) tile-size))
+                (z (* (- (cdr location) depth-offset) tile-size)))
             (enter (make-instance object :location (vec x 0 z)) scene))
           ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
@@ -178,6 +179,11 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 
 (defun interpolate (x0 x1 alpha)
   (+ (* x0 (- 1.0 alpha)) (* alpha x1)))
+
+(defun is-good-zone (value zones)
+  (let ((fuzzy (* 2 (random 5))))
+    (for:for ((zone in zones))
+      (<= (abs (- value zone)) fuzzy))))
 
 (defun resize-map (map dest-width dest-height)
   (let ((src-width (first (array-dimensions map)))
