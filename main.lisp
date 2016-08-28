@@ -17,7 +17,7 @@
   (let ((scene (scene main)))
     (enter (make-instance 'ground) scene)
     (enter (make-instance 'space-axes :size 100) scene)
-    (enter (make-instance 'colleen :inventory '(stick stick fireplace)) scene)
+    (enter (make-instance 'colleen :inventory '(fireplace plaster stick stick)) scene)
     (enter (make-instance 'following-camera :name :camera
                                             :target (unit :player scene)
                                             :location (vec 0 100 150)) scene)

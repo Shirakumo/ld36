@@ -208,6 +208,19 @@
   (call-next-method)
   (gl:blend-func :src-alpha :one-minus-src-alpha))
 
+(define-asset texture plaster (:ld36)
+  :file "plaster.png")
+
+(define-subject plaster (resource face-entity)
+  ()
+  (:default-initargs
+   :bounds (vec 40 40 40)
+   :texture '(:ld36 plaster)))
+
+(defmethod paint :before ((plaster plaster) (main main))
+  (gl:translate 0 (- (/ (vy (bounds plaster)) 2)) (vz (bounds plaster)))
+  (gl:rotate -90 1 0 0))
+
 (define-asset texture ground (:ld36)
   :file "ground.png"
   :wrapping :repeat)
