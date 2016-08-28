@@ -70,7 +70,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (for:for ((location in object-locations))
           (let ((x (* (- (car location) horiz-offset) tile-size))
                 (z (* (- (cdr location) depth-offset) tile-size)))
-            (enter (make-instance object :location (vec x 0 z)) scene))
+            (enter (make-instance object :location (vec x 0 z)) scene)
+            (v:log :info :map-generator "Added a ~a to (~a,~a)." object x z))
           ;; Regenerate to set different kinds of formations for different objects
           (nconc locations object-locations)))
       (when (< (1+ counter) (length objects))
