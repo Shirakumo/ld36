@@ -100,7 +100,6 @@
 
 (define-subject colleen (sprite-subject collidable flipping pivoted-entity)
   ((inventory :initform NIL :accessor inventory)
-   (interactable :initform NIL :accessor interactable)
    (placing :initform NIL :accessor placing))
   (:default-initargs
    :location (vec 0 0 0)
@@ -149,17 +148,6 @@
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
 
-    (let ((found (cons most-positive-single-float NIL)))
-      (do-container-tree (item *loop*)
-        (when (and (not (eql item colleen))
-                   (not (eql item placing))
-                   (typep item 'collidable))
-          (let ((time (collides colleen item)))
-            (when (and time (< time (car found)))
-              (setf (car found) time
-                    (cdr found) item)))))
-      (setf (interactable colleen) (cdr found)))
-
     (nv+ location velocity)
 
     (when (< (vy location) 0)
@@ -170,18 +158,31 @@
       (let ((maybe-loc (v+ location (vec (ecase facing (:left -30) (:right 30)) 0 0))))
         (setf (location placing) (align maybe-loc (bounds placing)))))))
 
+(defmethod interactables ((colleen colleen))
+  (let ((found (cons most-positive-single-float NIL)))
+    (do-container-tree (item *loop*)
+      (when (and (not (eql item colleen))
+                 (not (eql item (placing colleen)))
+                 (typep item 'collidable))
+        (let ((time (collides colleen item)))
+          (push (cons time item) found))))
+    (mapcar #'cdr (sort found #'< :key #'car))))
+
 (define-handler (colleen perform) (ev)
   (when (cond
           ((placing colleen)
            (setf (placing colleen) NIL))
-          ((interactable colleen)
-           (interact (interactable colleen) colleen)))
+          (T
+           (loop for interactable in (interactables colleen)
+                 thereis (interact interactable colleen))))
     (setf (animation colleen) 'use)))
 
 (define-handler (colleen use) (ev)
   (let* ((item (item (inventory colleen))))
     (when item
-      (when (use item (or (interactable colleen) colleen))
+      (when (or (loop for interactable in (interactables colleen)
+                      thereis (use item interactable))
+                (use item colleen))
         (setf (animation colleen) 'use)
         (leave item (inventory colleen))))))
 
