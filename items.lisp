@@ -67,6 +67,7 @@
 (define-subject ham (item food pass-through)
   ()
   (:default-initargs
+   :food-value 0.05
    :texture '(:ld36 ham)))
 
 (define-asset texture flower (:ld36)
