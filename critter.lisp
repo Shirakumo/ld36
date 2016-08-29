@@ -38,8 +38,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
        (when (< (random 6000) (incf last-moved))
          (let* ((avoid-direction (when previous-location (normalize (v- location previous-location))))
                 (relative-target (random-target 100 300 :avoid avoid-direction)))
-           (setf target (v+ location relative-target)))
-         (setf behavior :moving)))
+           (setf target (v+ location relative-target)
+                 behavior :moving))))
       (:moving
        (let ((relative-target (v- target location)))
          (setf velocity
@@ -50,8 +50,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                (T
                 (setf location target)))
          (when (v= location target)
-           (setf behavior :idle)
-           (setf previous-location location)))))))
+           (setf behavior :idle
+                 previous-location location)))))))
 
 (defun random-target (min max &key avoid)
   (let ((x (* (if (< 0 (random 2)) 1 -1) (+ min (random (- max min)))))
@@ -93,7 +93,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (define-subject mouse (critter)
   ((home :initform NIL :accessor home)
    (time-alive :initform 0 :accessor time-alive)
-   (go-home-at :initform (+ 1000 (random 2000)) :accessor go-home-at))
+   (go-home-at :initform (+ 500 (random 1000)) :accessor go-home-at))
   (:default-initargs
    :animations '((idle 2.0 1 :texture (:ld36 mouse-idle))
                  (walk 0.35 3 :texture (:ld36 mouse-walking) :next idle))))
@@ -105,19 +105,16 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   (leave mouse (scene (window :main)))
   (enter (make-instance 'dead-mouse) (inventory player)))
 
-(defmethod intesects ((mouse mouse) (hole mouse-hole))
-  (when (v= (home mouse) (target mouse))
-    (leave mouse (scene (window :main)))))
-
 (define-handler (mouse mouse-tick tick) (ev)
   (with-slots (time-alive behavior home target go-home-at) mouse
     (incf time-alive)
+    (cond ((and (v= (location mouse) home) target (v= target home))
+           (leave mouse (scene (window :main))))
+          ((or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
+           (setf target home
+                 behavior :moving)))
     (case behavior
       (:moving
        (setf (animation mouse) 'walk))
       (:idle
-       (setf (animation mouse) 'idle)
-       (when (or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
-         (setf target home
-               behavior :moving
-               (animation mouse) 'walk))))))
+       (setf (animation mouse) 'idle)))))
