@@ -16,7 +16,7 @@
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
-    (setf (clock scene) 0)
+    (reset scene)
     (enter (make-instance 'ground) scene)
     #+:ld36-debug (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen :inventory '(fireplace plaster stick stick)) scene)
@@ -27,18 +27,18 @@
                                                               :width 4000
                                                               :height 4000
                                                               :tile-size 20)
-                                               scene '(tree flower grass))))
+                                               scene '(tree flower grass)
+                                               :min-distance 2
+                                               :cluster-size 3)))
       (nconc populated-locations (populate-scene (make-instance 'noise-map
                                                                 :width 4000
                                                                 :height 4000
                                                                 :tile-size 40)
                                                  scene '(bush rock)
-                                                 :filter-locations populated-locations))
+                                                 :filter-locations populated-locations
+                                                 :cluster-size 4))
       (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
-    (enter (make-instance 'gameover :name :gameover) scene)
-    (unless (started main)
-      (enter (make-instance 'introduction) (scene main))
-      (setf (started main) T))))
+    (enter (make-instance 'gameover :name :gameover) scene)))
 
 (define-override (main focus-in-event) (ev)
   (start (scene main))

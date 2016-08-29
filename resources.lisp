@@ -271,7 +271,7 @@
 
 (defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 4000) (height 4000))
   (setf (noise-map tunnels) (make-instance 'noise-map :width width :height height
-                                                      :tile-size 20)))
+                                                      :tile-size (hole-tile tunnels))))
 
 (defmethod enter :after ((tunnels mouse-tunnels) (scene scene))
   (let ((locations (locations (noise-map tunnels) '(210 50)
