@@ -83,7 +83,7 @@
 (define-subject tree (resource face-entity)
   ()
   (:default-initargs
-   :bounds (vec 40 150 40)
+   :bounds (vec 40 150 60)
    :texture (alexandria:random-elt '((:ld36 tree)
                                      (:ld36 tree2)))))
 
@@ -99,7 +99,7 @@
 (define-subject rock (resource face-entity)
   ()
   (:default-initargs
-   :bounds (vec 60 60 40)
+   :bounds (vec 60 60 60)
    :texture (alexandria:random-elt '((:ld36 rock)
                                      (:ld36 rock2)))))
 

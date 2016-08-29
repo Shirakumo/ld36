@@ -55,8 +55,11 @@
           (min (max 0 near) 1))))))
 
 (defmethod collides ((a collidable) (b collidable))
-  (let ((v (velocity a)))
-    (cond ((v= v 0)
-           (when (intersects a b) 0))
-          (T
-           (segment-test b (location a) (velocity a) (v/ (hitbox a) 2))))))
+  ;; (let ((v (velocity a)))
+  ;;   (cond ((v= v 0)
+  ;;          (when (intersects a b) 0))
+  ;;         (T
+  ;;          (segment-test b (location a) (velocity a) (v/ (hitbox a) 2)))))
+  (let ((distance (vlength (v- (location a) (location b)))))
+    (when (< distance (/ (+ (vz (hitbox a)) (vz (hitbox b))) 2))
+      distance)))

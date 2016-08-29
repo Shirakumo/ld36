@@ -103,6 +103,7 @@
    (placing :initform NIL :accessor placing))
   (:default-initargs
    :location (vec 0 0 0)
+   :hitbox (vec 50 80 20)
    :bounds (vec 50 80 1)
    :pivot (vec -25 0 0.5)
    :name :player
@@ -166,8 +167,8 @@
                  (typep item 'collidable))
         (let ((time (collides colleen item)))
           (when time (push item found)))))
-    (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
-                                                  (location a)))))))
+    (print (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
+                                                         (location a))))))))
 
 (define-handler (colleen perform) (ev)
   (when (cond
