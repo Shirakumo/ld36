@@ -61,16 +61,19 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                width height (- (internal-time-millis) start))
         locations))))
 
-(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (zones '(200 50)) object-cap)
+(defmethod populate-scene ((genmap noise-map) (scene scene) objects &key (zones '(200 50)) object-cap filter-locations
+                                                                         (min-distance 1) (cluster-size 10))
   ;; About zones, it takes values between [0,255] where 128 is highest chance to appear.
   (let ((start (internal-time-millis))
-        (locations)
+        (locations filter-locations)
         (tile-size (tile-size genmap))
         (horiz-offset (floor (/ (width genmap) 2)))
         (depth-offset (floor (/ (height genmap) 2))))
     (for:for ((object in objects)
               (counter repeat (length objects)))
-      (let ((object-locations (locations genmap zones :filter-locations locations))
+      (let ((object-locations (locations genmap zones :filter-locations locations
+                                                      :min-distance min-distance
+                                                      :cluster-size cluster-size))
             (counter 0))
         (for:for ((location in object-locations))
           (until (and object-cap (< object-cap (incf counter))))
@@ -82,7 +85,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
       (when (< (1+ counter) (length objects))
         (regenerate genmap)))
     (v:log :info :map-generator "Adding objects to the map of size (~a x ~a) took ~a ms."
-           (width genmap) (height genmap) (- (internal-time-millis) start))))
+           (width genmap) (height genmap) (- (internal-time-millis) start))
+    locations))
 
 
 (defun blend-maps (&rest maps)

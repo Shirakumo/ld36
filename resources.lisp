@@ -233,7 +233,7 @@
   :file "mouse-hole.png")
 
 (define-subject mouse-hole (resource pass-through)
-  ((spawn-chance :initarg :spawn-chance :initform 0.01 :accessor spawn-chance))
+  ((spawn-chance :initarg :spawn-chance :initform 0.005 :accessor spawn-chance))
   (:default-initargs
    :bounds (vec 40 40 40)
    :texture '(:ld36 mouse-hole)))

@@ -7,7 +7,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-subject critter (sprite-subject collidable flipping pivoted-entity)
+(define-subject critter (sprite-subject collidable flipping pivoted-entity pass-through)
   ((behavior :initform :idle :accessor behavior)
    (previous-location :initform NIL :accessor previous-location)
    (last-moved :initform 0 :accessor last-moved)
@@ -35,7 +35,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   (with-slots (behavior last-moved target previous-location location velocity facing) critter
     (case behavior
       (:idle
-       (when (< (random 600) (incf last-moved))
+       (when (< (random 6000) (incf last-moved))
          (let* ((avoid-direction (when previous-location (normalize (v- location previous-location))))
                 (relative-target (random-target 100 300 :avoid avoid-direction)))
            (setf target (v+ location relative-target)))
@@ -91,18 +91,33 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   :file "mouse-walking.png")
 
 (define-subject mouse (critter)
-  ()
+  ((home :initform NIL :accessor home)
+   (time-alive :initform 0 :accessor time-alive)
+   (go-home-at :initform (+ 1000 (random 2000)) :accessor go-home-at))
   (:default-initargs
    :animations '((idle 2.0 1 :texture (:ld36 mouse-idle))
                  (walk 0.35 3 :texture (:ld36 mouse-walking) :next idle))))
+
+(defmethod initialize-instance :after ((mouse mouse) &key home)
+  (setf (home mouse) (or home (location mouse))))
 
 (defmethod interact ((mouse mouse) player)
   (leave mouse (scene (window :main)))
   (enter (make-instance 'dead-mouse) (inventory player)))
 
+(defmethod intesects ((mouse mouse) (hole mouse-hole))
+  (when (v= (home mouse) (target mouse))
+    (leave mouse (scene (window :main)))))
+
 (define-handler (mouse mouse-tick tick) (ev)
-  (case (behavior mouse)
-    (:moving
-     (setf (animation mouse) 'walk))
-    (:idle
-      (setf (animation mouse) 'idle))))
+  (with-slots (time-alive behavior home target go-home-at) mouse
+    (incf time-alive)
+    (case behavior
+      (:moving
+       (setf (animation mouse) 'walk))
+      (:idle
+       (setf (animation mouse) 'idle)
+       (when (or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
+         (setf target home
+               behavior :moving
+               (animation mouse) 'walk))))))

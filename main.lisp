@@ -24,9 +24,14 @@
     (enter (make-instance 'bush :location (vec -50 0 -50)) scene)
     (enter (make-instance 'tree :location (vec 100 0 100)) scene)
     (enter (make-instance 'rock :location (vec -100 0 100)) scene)
-    (enter (make-instance 'mouse-hole :location (vec 0 0 0)) scene)
-    (populate-scene (make-instance 'noise-map :width 2000 :height 2000) scene '(tree bush rock flower grass))
-    (populate-scene (make-instance 'noise-map :width 200 :height 200) scene '(mouse) :zones '(128) :object-cap 10)))
+    (let ((populated-locations (populate-scene (make-instance 'noise-map
+                                                              :width 2000
+                                                              :height 2000)
+                                               scene
+                                               '(tree bush rock flower grass))))
+      (populate-scene (make-instance 'noise-map :width 2000 :height 2000)
+                      scene '(mouse-hole) :filter-locations populated-locations
+                      :zones '(210 50) :cluster-size 3))))
 
 (defun launch ()
   (trial:launch 'main))
