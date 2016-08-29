@@ -58,9 +58,9 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
         (z (* (if (< 0 (random 2)) 1 -1) (+ min (random (- max min))))))
     (when (and avoid (v< 0 avoid))
       ;; 66% chance to turn away from a direction being avoided if earlier random chance pointed that way
-      (when (and (< 0 (* (vx avoid) x)) (< 1 (random 3)))
+      (when (and (< 0 (* (vx avoid) x)) (< 0 (random 3)))
         (setf x (- x)))
-      (when (and (< 0 (* (vz avoid) z)) (< 1 (random 3)))
+      (when (and (< 0 (* (vz avoid) z)) (< 0 (random 3)))
         (setf z (- z))))
     ;; So that diagonal isn't a longer movement distance
     (cap-distance (vec x 0 z) max)))
