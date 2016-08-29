@@ -143,7 +143,7 @@
     T))
 
 (defmethod use ((dead-mouse dead-mouse) (fireplace fireplace))
-  (when (built fireplace)
+  (when (and (built fireplace) (burning fireplace))
     (let ((ham (make-instance 'ham)))
       (enter ham (scene (window :main)))
       (setf (location ham) (v+ (location fireplace) (vec 0 10 0))
