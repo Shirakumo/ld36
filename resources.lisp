@@ -211,11 +211,19 @@
 (define-asset texture plaster (:ld36)
   :file "plaster.png")
 
+(define-asset texture plaster2 (:ld36)
+  :file "plaster2.png")
+
+(define-asset texture plaster3 (:ld36)
+  :file "plaster3.png")
+
 (define-subject plaster (resource face-entity)
   ()
   (:default-initargs
    :bounds (vec 40 40 40)
-   :texture '(:ld36 plaster)))
+   :texture (alexandria:random-elt '((:ld36 plaster)
+                                     (:ld36 plaster2)
+                                     (:ld36 plaster3)))))
 
 (defmethod paint :before ((plaster plaster) (main main))
   (gl:translate 0 (- (/ (vy (bounds plaster)) 2)) (vz (bounds plaster)))
