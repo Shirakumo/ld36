@@ -53,27 +53,6 @@
     (let ((item (item inventory index)))
       (leave item inventory))))
 
-(defun mkcolor (vec)
-  (flet ((fmt (a) (cond ((<= 0 a 1) (round (* 255 a)))
-                        ((< a 0) 0)
-                        ((< 255 a) 255)
-                        (T a))))
-    (etypecase vec
-      (vec (q+:make-qcolor (fmt (vx vec)) (fmt (vy vec)) (fmt (vz vec))))
-      (list (destructuring-bind (r g b &optional (a 1.0)) vec
-              (q+:make-qcolor (fmt r) (fmt g) (fmt b) (fmt a)))))))
-
-(defun draw-text (x y text &key (color (vec 1 1 1))
-                                (font (get-resource 'font :trial :debug-hud)))
-  (with-pushed-attribs T
-    (with-painter (painter *context*)
-      (with-finalizing ((color (mkcolor color)))
-        (setf (q+:render-hint painter) (q+:qpainter.text-antialiasing))
-        (setf (q+:render-hint painter) (q+:qpainter.high-quality-antialiasing))
-        (setf (q+:font painter) (data font))
-        (setf (q+:color (q+:pen painter)) color)
-        (q+:draw-text painter x y text)))))
-
 (defmethod paint ((inventory inventory) (hud hud))
   (let ((h (height hud))
         (s 50)
