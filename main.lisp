@@ -43,7 +43,9 @@
                                                  :cluster-size 4
                                                  :zones '(80 200)))
       (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
-    (enter (make-instance 'gameover :name :gameover) scene)))
+    (enter (make-instance 'gameover :name :gameover) scene)
+    (unless (started main)
+      (enter (make-instance 'introduction) scene))))
 
 (define-override (main focus-in-event) (ev)
   (start (scene main))
