@@ -77,9 +77,9 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                                                                          (min-distance 1) (cluster-size 10))
   ;; About zones, it takes values between [0,255] where 128 is highest chance to appear.
   (let ((start (internal-time-millis))
-        (locations filter-locations))
+        (locations))
     (for:for ((object in objects))
-      (let ((object-locations (locations genmap zones :filter-locations locations
+      (let ((object-locations (locations genmap zones :filter-locations (append locations filter-locations)
                                                       :min-distance min-distance
                                                       :cluster-size cluster-size
                                                       :limit object-cap)))

@@ -33,7 +33,7 @@
                                                scene '(tree flower grass)
                                                :min-distance 2
                                                :cluster-size 3
-                                               :zones '(90 200))))
+                                               :zones '(50 210))))
       (nconc populated-locations (populate-scene (make-instance 'noise-map
                                                                 :width 3000
                                                                 :height 3000
@@ -41,7 +41,7 @@
                                                  scene '(bush rock)
                                                  :filter-locations populated-locations
                                                  :cluster-size 4
-                                                 :zones '(90 200)))
+                                                 :zones '(80 200)))
       (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
     (enter (make-instance 'gameover :name :gameover) scene)))
 
