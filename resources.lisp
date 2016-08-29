@@ -43,15 +43,6 @@
       (gl:vertex (vx bounds) 0 0))
     (gl:enable :texture-2d)))
 
-(define-asset texture flower (:ld36)
-  :file "flower.png")
-
-(define-subject flower (resource pass-through)
-  ()
-  (:default-initargs
-   :bounds (vec 40 40 20)
-   :texture '(:ld36 flower)))
-
 (define-asset texture grass (:ld36)
   :file "grass.png")
 
