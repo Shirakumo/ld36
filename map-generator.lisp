@@ -73,18 +73,17 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   ;; About zones, it takes values between [0,255] where 128 is highest chance to appear.
   (let ((start (internal-time-millis))
         (locations filter-locations))
-    (for:for ((object in objects)
-              (counter repeat (length objects)))
+    (for:for ((object in objects))
       (let ((object-locations (locations genmap zones :filter-locations locations
                                                       :min-distance min-distance
                                                       :cluster-size cluster-size
                                                       :limit object-cap)))
         (for:for ((location in object-locations))
           (enter (make-instance object :location (vec (car location) 0 (cdr location))) scene)
-          (setf locations (append locations object-locations))))
+          (setf locations (append locations object-locations)))
+        (setf locations (append locations object-locations)))
       ;; Regenerate to set different kinds of formations for different objects
-      (when (< (1+ counter) (length objects))
-        (regenerate genmap)))
+      (regenerate genmap))
     (v:log :info :map-generator "Adding objects to the map of size (~a x ~a) took ~a ms."
            (width genmap) (height genmap) (- (internal-time-millis) start))
     locations))
