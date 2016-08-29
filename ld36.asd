@@ -21,6 +21,7 @@
                (:file "items")
                (:file "resources")
                (:file "inventory")
+               (:file "flipping")
                (:file "colleen")
                (:file "critter"))
   :depends-on (:trial

@@ -98,16 +98,14 @@
 (define-asset texture colleen-throw (:ld36)
   :file "colleen-throw.png")
 
-(define-subject colleen (sprite-subject collidable rotated-entity pivoted-entity)
-  ((facing :initarg :facing :accessor facing)
-   (inventory :initform NIL :accessor inventory)
+(define-subject colleen (sprite-subject collidable flipping pivoted-entity)
+  ((inventory :initform NIL :accessor inventory)
    (interactable :initform NIL :accessor interactable)
    (placing :initform NIL :accessor placing))
   (:default-initargs
    :location (vec 0 0 0)
    :bounds (vec 50 80 1)
    :pivot (vec -25 0 0.5)
-   :facing :left
    :name :player
    :animations '((idle  2.0 20 :texture (:ld36 colleen-idle))
                  (walk  0.7 20 :texture (:ld36 colleen-walking) :next idle)
@@ -129,7 +127,7 @@
        (* (round (vz vector) (vz grid)) (vz grid))))
 
 (define-handler (colleen tick) (ev)
-  (with-slots (facing velocity location angle placing) colleen
+  (with-slots (facing velocity location placing) colleen
     (cond ((retained 'movement :left) (setf facing :left))
           ((retained 'movement :right) (setf facing :right)))
     
@@ -163,11 +161,6 @@
       (setf (interactable colleen) (cdr found)))
 
     (nv+ location velocity)
-
-    (let* ((ang (* (/ angle 180) PI))
-           (vec (nvrot (vec -1 0 0) (vec 0 1 0) ang)))
-      (when (< 0.01 (abs (- (vx vec) (ecase facing (:left -1) (:right 1)))))
-        (incf angle 20)))
 
     (when (< (vy location) 0)
       (setf (vy location) 0)
