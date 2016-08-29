@@ -23,10 +23,16 @@
                                             :target (unit :player scene)
                                             :location (vec 0 100 150)) scene)
     (let ((populated-locations (populate-scene (make-instance 'noise-map
-                                                              :width 2000
-                                                              :height 2000)
-                                               scene
-                                               '(tree bush rock flower grass))))
+                                                              :width 4000
+                                                              :height 4000
+                                                              :tile-size 20)
+                                               scene '(tree flower grass))))
+      (nconc populated-locations (populate-scene (make-instance 'noise-map
+                                                                :width 4000
+                                                                :height 4000
+                                                                :tile-size 40)
+                                                 scene '(bush rock)
+                                                 :filter-locations populated-locations))
       (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
     (enter (make-instance 'gameover :name :gameover) scene)
     (unless (started main)

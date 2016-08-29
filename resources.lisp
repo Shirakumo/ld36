@@ -239,18 +239,19 @@
    (spawn-max :initform (+ 1 (random 10)) :accessor spawn-max)
    (tunnels :initarg :tunnels :accessor tunnels))
   (:default-initargs
-   :bounds (vec 40 40 40)
+   :bounds (vec 10 10 10)
    :texture '(:ld36 mouse-hole)))
 
 (define-handler (mouse-hole tick) (ev)
-  (with-slots (spawn-chance live gone spawn-max) mouse-hole
-    (when (and (< live spawn-max)
-               (<= (random 1.0) spawn-chance))
-      (incf (live mouse-hole))
-      (enter (make-instance 'mouse :location (vcopy (location mouse-hole))
-                                   :home mouse-hole) *loop*))
-    (when (<= spawn-max gone)
-      (leave mouse-hole (scene (window :main))))))
+  (when (running (scene (window :main)))
+    (with-slots (spawn-chance live gone spawn-max) mouse-hole
+      (when (and (< live spawn-max)
+                 (<= (random 1.0) spawn-chance))
+        (incf (live mouse-hole))
+        (enter (make-instance 'mouse :location (vcopy (location mouse-hole))
+                                     :home mouse-hole) *loop*))
+      (when (<= spawn-max gone)
+        (leave mouse-hole (scene (window :main)))))))
 
 (defmethod leave :after ((mouse-hole mouse-hole) (scene scene))
   (when (running scene)
@@ -262,31 +263,35 @@
    (location-queue :initform NIL :accessor location-queue)
    (new-locations :initform NIL :accessor new-locations)
    (old-locations :initform NIL :accessor old-locations)
-   (hole-count :initarg :hole-count :accessor hole-count))
+   (hole-count :initarg :hole-count :accessor hole-count)
+   (hole-tile :initarg :hole-tile :accessor hole-tile))
   (:default-initargs
-   :hole-count 100))
+   :hole-count 100
+   :hole-tile 20))
 
-(defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 2000)
-                                                                    (height 2000))
-  (setf (noise-map tunnels) (make-instance 'noise-map :width width :height height)))
+(defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 4000) (height 4000))
+  (setf (noise-map tunnels) (make-instance 'noise-map :width width :height height
+                                                      :tile-size 20)))
 
 (defmethod enter :after ((tunnels mouse-tunnels) (scene scene))
   (let ((locations (locations (noise-map tunnels) '(210 50)
                               :cluster-size 3
-                              :filter-locations (filter-locations tunnels))))
-    (for:for ((loc in locations)
-              (i repeat (hole-count tunnels)))
-      (until (<= (hole-count tunnels) i))
+                              :filter-locations (filter-locations tunnels)
+                              :limit (hole-count tunnels)))
+        (hole-locs NIL))
+    (for:for ((loc in locations))
       (enter (make-instance 'mouse-hole :location (vec (car loc) 0 (cdr loc))
-                                        :tunnels tunnels) *loop*))
-    (setf (old-locations tunnels) locations)))
+                                        :tunnels tunnels) *loop*)
+      (push loc hole-locs))
+    (setf (old-locations tunnels) hole-locs)))
 
 (defmethod add-hole ((tunnels mouse-tunnels))
   (with-slots (location-queue new-locations old-locations hole-count noise-map filter-locations) tunnels
     (unless location-queue
       (setf (location-queue tunnels) (locations noise-map '(210 50)
                                                 :cluster-size 3
-                                                :filter-locations (append old-locations filter-locations new-locations))))
+                                                :filter-locations (append old-locations filter-locations new-locations)
+                                                :limit hole-count)))
     (let* ((loc (pop (location-queue tunnels)))
            (new-hole (make-instance 'mouse-hole :location (vec (car loc) 0 (cdr loc))
                                                 :tunnels tunnels)))
