@@ -16,6 +16,7 @@
   :defsystem-depends-on (:qtools)
   :components ((:file "package")
                (:file "main")
+               (:file "screens")
                (:file "map-generator")
                (:file "collision")
                (:file "items")

@@ -137,7 +137,9 @@
 (define-handler (colleen tick) (ev)
   (with-slots (facing velocity location placing stomach) colleen
     (cond ((<= (fullness stomach) 0)
-           (setf (animation colleen) 'die))
+           (unless (eql (name (animation colleen)) 'die)
+             (setf (animation colleen) 'die)
+             (start (unit :gameover *loop*))))
           (T
            (cond ((retained 'movement :left) (setf facing :left))
                  ((retained 'movement :right) (setf facing :right)))
