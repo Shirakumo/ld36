@@ -56,11 +56,16 @@
           (min (max 0 near) 1))))))
 
 (defmethod collides ((a collidable) (b collidable))
-  ;; (let ((v (velocity a)))
-  ;;   (cond ((v= v 0)
-  ;;          (when (intersects a b) 0))
-  ;;         (T
-  ;;          (segment-test b (location a) (velocity a) (v/ (hitbox a) 2)))))
-  (let ((distance (vlength (v- (location a) (location b)))))
-    (when (< distance (/ (+ (vz (hitbox a)) (vz (hitbox b))) 2))
+  (let ((v (velocity a)))
+    (cond ((typep b 'pass-through) NIL)
+          ((v= v 0)
+           (when (intersects a b) 0))
+          (T
+           (segment-test b (location a) (velocity a) (v/ (hitbox a) 2))))))
+
+(defmethod close-by ((a collidable) (b collidable))
+  (let ((distance (vlength (v- (location a) (location b))))
+        (bounding (nv/ (v+ (hitbox a) (hitbox b)) 2)))
+    (setf (vy bounding) 0)
+    (when (< distance (vlength bounding))
       distance)))

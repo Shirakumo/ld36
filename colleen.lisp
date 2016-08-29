@@ -167,8 +167,8 @@
       (when (and (not (eql item colleen))
                  (not (eql item (placing colleen)))
                  (typep item 'collidable))
-        (let ((time (collides colleen item)))
-          (when time (push item found)))))
+        (when (close-by colleen item)
+          (push item found))))
     (print (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
                                                          (location a))))))))
 
