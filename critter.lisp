@@ -99,19 +99,23 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                  (walk 0.7 2 :texture (:ld36 mouse-walking) :next idle))))
 
 (defmethod initialize-instance :after ((mouse mouse) &key home)
-  (setf (home mouse) (v+ (vec 0 0 0) (or home (location mouse)))))
+  ;; TODO: spawn a home hole if home is NIL
+  (setf (home mouse) home))
 
 (defmethod interact ((mouse mouse) player)
   (leave mouse (scene (window :main)))
   (enter (make-instance 'dead-mouse) (inventory player)))
 
+(defmethod leave :after ((mouse mouse) (scene scene))
+  (incf (gone (home mouse))))
+
 (define-handler (mouse mouse-tick tick) (ev)
   (with-slots (time-alive behavior home target go-home-at) mouse
     (incf time-alive)
-    (cond ((and (v= (location mouse) home) target (v= target home))
+    (cond ((and target (v= target (location home)) (v= (location mouse) (location home)))
            (leave mouse (scene (window :main))))
           ((or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
-           (setf target home
+           (setf target (location home)
                  behavior :moving)))
     (case behavior
       (:moving

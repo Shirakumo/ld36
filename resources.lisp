@@ -233,14 +233,23 @@
   :file "mouse-hole.png")
 
 (define-subject mouse-hole (resource pass-through)
-  ((spawn-chance :initarg :spawn-chance :initform 0.005 :accessor spawn-chance))
+  ((spawn-chance :initarg :spawn-chance :initform 0.005 :accessor spawn-chance)
+   (gone :initform 0 :accessor gone)
+   (live :initform 0 :accessor live)
+   (spawn-max :initform (+ 1 (random 10)) :accessor spawn-max))
   (:default-initargs
    :bounds (vec 40 40 40)
    :texture '(:ld36 mouse-hole)))
 
 (define-handler (mouse-hole tick) (ev)
-  (when (<= (random 1.0) (spawn-chance mouse-hole))
-    (enter (make-instance 'mouse :location (vcopy (location mouse-hole))) *loop*)))
+  (with-slots (spawn-chance live gone spawn-max) mouse-hole
+    (when (and (< live spawn-max)
+               (<= (random 1.0) spawn-chance))
+      (incf (live mouse-hole))
+      (enter (make-instance 'mouse :location (vcopy (location mouse-hole))
+                                   :home mouse-hole) *loop*))
+    (when (<= spawn-max gone)
+      (leave mouse-hole (scene (window :main))))))
 
 (define-asset texture ground (:ld36)
   :file "ground.png"
