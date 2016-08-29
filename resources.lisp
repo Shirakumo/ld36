@@ -239,7 +239,7 @@
    (spawn-max :initform (+ 1 (random 10)) :accessor spawn-max)
    (tunnels :initarg :tunnels :accessor tunnels))
   (:default-initargs
-   :bounds (vec 10 10 10)
+   :bounds (vec 40 40 40)
    :texture '(:ld36 mouse-hole)))
 
 (define-handler (mouse-hole tick) (ev)
@@ -269,7 +269,7 @@
    :hole-count 100
    :hole-tile 20))
 
-(defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 4000) (height 4000))
+(defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 3000) (height 3000))
   (setf (noise-map tunnels) (make-instance 'noise-map :width width :height height
                                                       :tile-size (hole-tile tunnels))))
 
