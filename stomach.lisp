@@ -12,9 +12,11 @@
    (hunger-interval :initarg :hunger-interval :initform 1 :accessor hunger-interval)
    (previous-update :initform 0 :accessor previous-update)))
 
+(defmethod (setf fullness) :around (value (stomach stomach))
+  (call-next-method (min 1.0 (max 0.0 value)) stomach))
+
 (defmethod eat ((food food) (stomach stomach))
-  (setf (fullness stomach) (min 1.0 (+ (fullness stomach)
-                                       (food-value food)))))
+  (incf (fullness stomach) (food-value food)))
 
 (defmethod paint ((stomach stomach) (hud hud))
   (with-pushed-matrix
