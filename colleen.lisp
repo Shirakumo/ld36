@@ -135,7 +135,7 @@
        (* (round (vz vector) (vz grid)) (vz grid))))
 
 (define-handler (colleen tick) (ev)
-  (with-slots (facing velocity location placing) colleen
+  (with-slots (facing velocity location placing stomach) colleen
     (cond ((retained 'movement :left) (setf facing :left))
           ((retained 'movement :right) (setf facing :right)))
     
@@ -193,7 +193,10 @@
       (let ((maybe-loc (v+ location (vec (* (vx (bounds placing)) (ecase facing (:left -1) (:right 1)))
                                          0 0))))
         (setf (location placing) (v+ (align maybe-loc (bounds placing))
-                                     (vec 0 5 0)))))))
+                                     (vec 0 5 0)))))
+
+    (when (<= (fullness stomach) 0)
+      (setf (animation colleen) 'die))))
 
 (defmethod interactables ((colleen colleen))
   (let ((found ()))
