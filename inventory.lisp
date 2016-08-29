@@ -42,6 +42,9 @@
           (T
            (array-utils:vector-pop-front vec)))))
 
+(defmethod leave ((resource resource) (inventory inventory))
+  NIL)
+
 (defmethod leave ((index integer) (inventory inventory))
   (when (< -1 index (length (items inventory)))
     (let ((item (item inventory index)))

@@ -217,7 +217,7 @@
 
 (defmethod use ((resource resource) (colleen colleen))
   (unless (placing colleen)
-    (enter resource (scene (window :main)))
-    (setf (placing colleen) resource)
-    (enter (type-of resource) (inventory colleen))
+    (let ((resource (make-instance (type-of resource))))
+      (enter resource (scene (window :main)))
+      (setf (placing colleen) resource))
     T))
