@@ -98,6 +98,9 @@
 (define-asset texture colleen-throw (:ld36)
   :file "colleen-throw.png")
 
+(define-asset texture colleen-die (:ld36)
+  :file "colleen-die.png")
+
 (define-subject colleen (sprite-subject collidable flipping pivoted-entity)
   ((inventory :initform NIL :accessor inventory)
    (placing :initform NIL :accessor placing)
@@ -108,10 +111,11 @@
    :bounds (vec 50 80 1)
    :pivot (vec -25 0 0.5)
    :name :player
-   :animations '((idle  2.0 20 :texture (:ld36 colleen-idle))
-                 (walk  0.7 20 :texture (:ld36 colleen-walking) :next idle)
+   :animations '((idle  2.0 20 :texture (:ld36 colleen-idle) :next idle)
+                 (walk  0.7 20 :texture (:ld36 colleen-walking) :next walk)
                  (use   0.7 12 :texture (:ld36 colleen-using) :next idle)
-                 (throw 0.7 12 :texture (:ld36 colleen-throw) :next idle))))
+                 (throw 0.7 12 :texture (:ld36 colleen-throw) :next idle)
+                 (die   2.0 37 :texture (:ld36 colleen-die)))))
 
 (defmethod initialize-instance :after ((colleen colleen) &key inventory fullness)
   (setf (inventory colleen) (make-instance 'inventory :items inventory))
