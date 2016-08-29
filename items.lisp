@@ -48,3 +48,11 @@
   ()
   (:default-initargs
    :texture '(:ld36 pebble)))
+
+(define-asset texture ham (:ld36)
+  :file "bush.png")
+
+(define-subject ham (item)
+  ()
+  (:default-initargs
+   :texture '(:ld36 ham)))

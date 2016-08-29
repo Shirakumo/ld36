@@ -26,7 +26,7 @@
     (enter (make-instance 'rock :location (vec -100 0 100)) scene)
     (enter (make-instance 'fireplace :location (vec 0 0 0)) scene)
     (populate-scene (make-instance 'noise-map :width 2000 :height 2000) scene '(tree bush rock flower grass))
-    (populate-scene (make-instance 'noise-map :width 200 :height 200) scene '(cat) :zones '(128) :object-cap 10)))
+    (populate-scene (make-instance 'noise-map :width 200 :height 200) scene '(mouse) :zones '(128) :object-cap 10)))
 
 (defun launch ()
   (trial:launch 'main))

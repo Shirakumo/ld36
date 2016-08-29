@@ -7,7 +7,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-subject critter (collidable flipping pivoted-entity)
+(define-subject critter (item flipping pivoted-entity)
   ((behavior :initform :idle :accessor behavior)
    (previous-location :initform NIL :accessor previous-location)
    (last-moved :initform 0 :accessor last-moved)
@@ -23,6 +23,8 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   (with-pushed-matrix
     (gl:translate 0 0 (- (vz (pivot critter))))
     (call-next-method)))
+
+(defmethod use ((critter critter) (with entity)))
 
 (define-handler (critter tick) (ev)
   (with-slots (behavior last-moved target previous-location location velocity facing) critter
@@ -77,11 +79,20 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (defun normalize (vec)
   (v/ vec (distance vec)))
 
-(define-asset texture cat (:ld36)
+(define-asset texture mouse (:ld36)
   :file "flower.png")
 
-(define-subject cat (face-entity critter)
+(define-subject mouse (critter)
   ()
   (:default-initargs
    :bounds (vec 40 40 20)
-   :texture '(:ld36 cat)))
+   :texture '(:ld36 mouse)))
+
+(defmethod use ((mouse mouse) (fireplace fireplace))
+  (when (built fireplace)
+    (let ((ham (make-instance 'ham)))
+      (enter ham (scene (window :main)))
+      (setf (location ham) (v+ (location fireplace) (vec 0 10 0))
+            (velocity ham) (vec (- (random 8.0) 4)
+                                (random 10.0)
+                                (- (random 4.0) 2.0))))))
