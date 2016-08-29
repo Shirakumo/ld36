@@ -12,7 +12,7 @@
 (define-widget main (QGLWidget trial:main)
   ((started :initform NIL :accessor started))
   (:default-initargs :clear-color (vec 1 1 1)
-                     :title "Cool Gayme"))
+                     :title "Back to the Roots"))
 
 (define-initializer (main set-resolution)
   (q+:resize main 1024 786))
@@ -55,4 +55,4 @@
 
 (defun launch ()
   #+sbcl (when *standalone* (sb-ext:disable-debugger))
-  (trial:launch 'main :application-name "Cool Gayme"))
+  (trial:launch 'main :application-name "Back to the Roots"))
