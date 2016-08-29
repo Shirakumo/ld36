@@ -7,7 +7,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-subject critter (collidable)
+(define-subject critter (collidable flipping pivoted-entity)
   ((behavior :initform :idle :accessor behavior)
    (previous-location :initform NIL :accessor previous-location)
    (last-moved :initform 0 :accessor last-moved)
@@ -25,7 +25,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
     (call-next-method)))
 
 (define-handler (critter tick) (ev)
-  (with-slots (behavior last-moved target previous-location location velocity) critter
+  (with-slots (behavior last-moved target previous-location location velocity facing) critter
     (case behavior
       (:idle
        (when (< (random 600) (incf last-moved))
@@ -37,9 +37,11 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
        (let ((relative-target (v- target location)))
          (setf velocity
                (v* (vec 5 0 5) (normalize relative-target)))
-         (if (< (distance velocity) (distance relative-target))
-             (nv+ location velocity)
-             (setf location target))
+         (cond ((< (distance velocity) (distance relative-target))
+                (nv+ location velocity)
+                (setf facing (if (< (vx velocity) 0) :left :right)))
+               (T
+                (setf location target)))
          (when (v= location target)
            (setf behavior :idle)
            (setf previous-location location)))))))
@@ -68,7 +70,9 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   ;; TODO: (sqrt 2) and (sqrt 0.5) should be cached into parameter
   ;; NOTE: This is only the 2D space distance!!!
   (* (/ (1+ (sqrt (- 4 (* 2 (sqrt 2))))) 2)
-     (max (abs (vx vec)) (abs (vz vec)) (* (sqrt 0.5) (+ (abs (vx vec)) (abs (vz vec)))))))
+     (max (abs (vx vec))
+          (abs (vz vec))
+          (* (sqrt 0.5) (+ (abs (vx vec)) (abs (vz vec)))))))
 
 (defun normalize (vec)
   (v/ vec (distance vec)))
@@ -76,7 +80,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (define-asset texture cat (:ld36)
   :file "flower.png")
 
-(define-subject cat (critter face-entity)
+(define-subject cat (face-entity critter)
   ()
   (:default-initargs
    :bounds (vec 40 40 20)
