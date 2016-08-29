@@ -253,7 +253,8 @@
       (leave mouse-hole (scene (window :main))))))
 
 (defmethod leave :after ((mouse-hole mouse-hole) (scene scene))
-  (add-hole (tunnels mouse-hole)))
+  (when (running scene)
+    (add-hole (tunnels mouse-hole))))
 
 (define-subject mouse-tunnels ()
   ((noise-map :initform NIL :accessor noise-map)

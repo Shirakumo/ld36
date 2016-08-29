@@ -32,26 +32,27 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (defmethod interact ((critter critter) player))
 
 (define-handler (critter tick) (ev)
-  (with-slots (behavior last-moved target previous-location location velocity facing) critter
-    (case behavior
-      (:idle
-       (when (< (random 6000) (incf last-moved))
-         (let* ((avoid-direction (when previous-location (normalize (v- location previous-location))))
-                (relative-target (random-target 100 300 :avoid avoid-direction)))
-           (setf target (v+ location relative-target)
-                 behavior :moving))))
-      (:moving
-       (let ((relative-target (v- target location)))
-         (setf velocity
-               (v* (vec 5 0 5) (normalize relative-target)))
-         (cond ((< (distance velocity) (distance relative-target))
-                (nv+ location velocity)
-                (setf facing (if (< (vx velocity) 0) :left :right)))
-               (T
-                (setf location target)))
-         (when (v= location target)
-           (setf behavior :idle
-                 previous-location location)))))))
+  (when (running (scene (window :main)))
+    (with-slots (behavior last-moved target previous-location location velocity facing) critter
+      (case behavior
+        (:idle
+         (when (< (random 6000) (incf last-moved))
+           (let* ((avoid-direction (when previous-location (normalize (v- location previous-location))))
+                  (relative-target (random-target 100 300 :avoid avoid-direction)))
+             (setf target (v+ location relative-target)
+                   behavior :moving))))
+        (:moving
+         (let ((relative-target (v- target location)))
+           (setf velocity
+                 (v* (vec 5 0 5) (normalize relative-target)))
+           (cond ((< (distance velocity) (distance relative-target))
+                  (nv+ location velocity)
+                  (setf facing (if (< (vx velocity) 0) :left :right)))
+                 (T
+                  (setf location target)))
+           (when (v= location target)
+             (setf behavior :idle
+                   previous-location location))))))))
 
 (defun random-target (min max &key avoid)
   (let ((x (* (if (< 0 (random 2)) 1 -1) (+ min (random (- max min)))))
@@ -107,18 +108,20 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   (enter (make-instance 'dead-mouse) (inventory player)))
 
 (defmethod leave :after ((mouse mouse) (scene scene))
-  (incf (gone (home mouse))))
+  (when (running scene)
+    (incf (gone (home mouse)))))
 
 (define-handler (mouse mouse-tick tick) (ev)
-  (with-slots (time-alive behavior home target go-home-at) mouse
-    (incf time-alive)
-    (cond ((and target (v= target (location home)) (v= (location mouse) (location home)))
-           (leave mouse (scene (window :main))))
-          ((or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
-           (setf target (location home)
-                 behavior :moving)))
-    (case behavior
-      (:moving
-       (setf (animation mouse) 'walk))
-      (:idle
-       (setf (animation mouse) 'idle)))))
+  (when (running (scene (window :main)))
+    (with-slots (time-alive behavior home target go-home-at) mouse
+      (incf time-alive)
+      (cond ((and target (v= target (location home)) (v= (location mouse) (location home)))
+             (leave mouse (scene (window :main))))
+            ((or (<= go-home-at time-alive) (= 0 (random (- go-home-at time-alive))))
+             (setf target (location home)
+                   behavior :moving)))
+      (case behavior
+        (:moving
+         (setf (animation mouse) 'walk))
+        (:idle
+         (setf (animation mouse) 'idle))))))
