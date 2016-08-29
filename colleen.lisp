@@ -159,13 +159,14 @@
         (setf (location placing) (align maybe-loc (bounds placing)))))))
 
 (defmethod interactables ((colleen colleen))
-  (let ((found (cons most-positive-single-float NIL)))
+  (let ((found ()))
     (do-container-tree (item *loop*)
       (when (and (not (eql item colleen))
                  (not (eql item (placing colleen)))
                  (typep item 'collidable))
         (let ((time (collides colleen item)))
-          (push (cons time item) found))))
+          (when time
+            (push (cons time item) found)))))
     (mapcar #'cdr (sort found #'< :key #'car))))
 
 (define-handler (colleen perform) (ev)
