@@ -95,3 +95,6 @@
 
 (defmethod remove-item ((inventory inventory) &optional (index (index inventory)))
   (leave index inventory))
+
+(defmethod clear ((inventory inventory))
+  (setf (items inventory) (make-array 0 :adjustable T :fill-pointer T)))

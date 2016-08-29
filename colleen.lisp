@@ -135,9 +135,10 @@
        (* (round (vz vector) (vz grid)) (vz grid))))
 
 (define-handler (colleen tick) (ev)
-  (with-slots (facing velocity location placing stomach) colleen
+  (with-slots (facing velocity location placing stomach inventory) colleen
     (cond ((<= (fullness stomach) 0)
            (unless (eql (name (animation colleen)) 'die)
+             (clear inventory)
              (setf (animation colleen) 'die)
              (start (unit :gameover *loop*))))
           (T
