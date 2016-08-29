@@ -15,15 +15,13 @@
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
+    (reset scene)
     (enter (make-instance 'ground) scene)
     (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen :inventory '(fireplace plaster stick stick)) scene)
     (enter (make-instance 'following-camera :name :camera
                                             :target (unit :player scene)
                                             :location (vec 0 100 150)) scene)
-    (enter (make-instance 'bush :location (vec -50 0 -50)) scene)
-    (enter (make-instance 'tree :location (vec 100 0 100)) scene)
-    (enter (make-instance 'rock :location (vec -100 0 100)) scene)
     (let ((populated-locations (populate-scene (make-instance 'noise-map
                                                               :width 2000
                                                               :height 2000)
