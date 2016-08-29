@@ -54,4 +54,5 @@
   (stop-overriding))
 
 (defun launch ()
+  #+sbcl (when *standalone* (sb-ext:disable-debugger))
   (trial:launch 'main :application-name "Cool Gayme"))
