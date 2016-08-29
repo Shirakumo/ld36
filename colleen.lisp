@@ -167,7 +167,13 @@
                               (< 0 (vz velocity)))
                          (and (<= (abs (- (vz colpos) (vz rr))) 1)
                               (< (vz velocity) 0)))
-                     (setf (vz velocity) 0))))))))
+                     (setf (vz velocity) 0))))))
+        (when (and (typep item 'plaster)
+                   (close-by colleen item))
+          (cond ((< 0 (vx velocity))
+                 (setf (vx velocity) 8))
+                ((< (vx velocity) 0)
+                 (setf (vx velocity) -8))))))
 
     (nv+ location velocity)
 
