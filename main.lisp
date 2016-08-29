@@ -10,11 +10,8 @@
 (define-pool :ld36)
 
 (define-widget main (QGLWidget trial:main)
-  ()
+  ((started :initform NIL :accessor started))
   (:default-initargs :clear-color (vec 1 1 1)))
-
-(define-initializer (main first-time-setup -1000)
-  (enter (make-instance 'introduction) (scene main)))
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
@@ -31,7 +28,10 @@
                                                scene
                                                '(tree bush rock flower grass))))
       (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
-    (enter (make-instance 'gameover :name :gameover) scene)))
+    (enter (make-instance 'gameover :name :gameover) scene)
+    (unless (started main)
+      (enter (make-instance 'introduction) (scene main))
+      (setf (started main) T))))
 
 (define-override (main focus-in-event) (ev)
   (start (scene main))
