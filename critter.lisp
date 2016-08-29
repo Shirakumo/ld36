@@ -99,7 +99,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
                  (walk 0.35 3 :texture (:ld36 mouse-walking) :next idle))))
 
 (defmethod initialize-instance :after ((mouse mouse) &key home)
-  (setf (home mouse) (or home (location mouse))))
+  (setf (home mouse) (v+ (vec 0 0 0) (or home (location mouse)))))
 
 (defmethod interact ((mouse mouse) player)
   (leave mouse (scene (window :main)))
