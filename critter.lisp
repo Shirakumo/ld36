@@ -94,7 +94,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
   ()
   (:default-initargs
    :animations '((idle 2.0 1 :texture (:ld36 mouse-idle))
-                 (walk 1.4 2 :texture (:ld36 mouse-walking) :next idle))))
+                 (walk 0.35 3 :texture (:ld36 mouse-walking) :next idle))))
 
 (defmethod interact ((mouse mouse) player)
   (leave mouse (scene (window :main)))
