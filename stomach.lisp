@@ -23,7 +23,8 @@
     (let* ((w 200)
            (f (* w (fullness stomach)))
            (h (height hud)))
-      (gl:translate 5 (- h 80) 0)
+      (gl:translate 5 (- h 85) 0)
+      (draw-text 5 (- h 90) "Stomach:" (vec 1 1 1))
       (gl:color 0 0 0)
       (with-primitives :quads
         (gl:vertex 0 0)

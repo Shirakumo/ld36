@@ -78,6 +78,7 @@
     (with-pushed-matrix
       (gl:translate p (- h p) 0)
       (gl:scale 1 -1 1)
+      (draw-text p (- h p s 5) "Inventory: " (vec 1 1 1))
       (loop for item across (items inventory)
             for i from 0
             do (paint (elt item 0) hud)
