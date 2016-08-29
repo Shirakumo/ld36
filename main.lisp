@@ -13,9 +13,12 @@
   ()
   (:default-initargs :clear-color (vec 1 1 1)))
 
+(define-initializer (main first-time-setup -1000)
+  (enter (make-instance 'introduction) (scene main)))
+
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
-    (reset scene)
+    (setf (clock scene) 0)
     (enter (make-instance 'ground) scene)
     #+:ld36-debug (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen :inventory '(fireplace plaster stick stick)) scene)
