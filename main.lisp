@@ -32,5 +32,13 @@
                                           :zones '(210 50) :cluster-size 3))
     (enter (make-instance 'gameover :name :gameover) scene)))
 
+(define-override (main focus-in-event) (ev)
+  (start (scene main))
+  (stop-overriding))
+
+(define-override (main focus-out-event) (ev)
+  (stop (scene main))
+  (stop-overriding))
+
 (defun launch ()
   (trial:launch 'main))
