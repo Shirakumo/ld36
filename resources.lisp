@@ -229,6 +229,19 @@
   (gl:translate 0 (- (/ (vy (bounds plaster)) 2)) (vz (bounds plaster)))
   (gl:rotate -90 1 0 0))
 
+(define-asset texture mouse-hole (:ld36)
+  :file "mouse-hole.png")
+
+(define-subject mouse-hole (resource pass-through)
+  ((spawn-chance :initarg :spawn-chance :initform 0.01 :accessor spawn-chance))
+  (:default-initargs
+   :bounds (vec 40 40 40)
+   :texture '(:ld36 mouse-hole)))
+
+(define-handler (mouse-hole tick) (ev)
+  (when (<= (random 1.0) (spawn-chance mouse-hole))
+    (enter (make-instance 'mouse :location (vcopy (location mouse-hole))) *loop*)))
+
 (define-asset texture ground (:ld36)
   :file "ground.png"
   :wrapping :repeat)
