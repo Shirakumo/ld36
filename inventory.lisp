@@ -11,7 +11,7 @@
   :file "inventory.png")
 
 (define-subject inventory (hud-entity unsavable)
-  ((items :initform () :accessor items)
+  ((items :initform (make-array 0 :adjustable T :fill-pointer T) :accessor items)
    (index :initarg :index :initform 0 :accessor index)
    (invbg :initform (get-resource 'texture :ld36 'selected-item) :reader invbg)))
 
@@ -29,13 +29,16 @@
   (let ((vec (inv-find-container item inventory)))
     (if vec
         (vector-push-extend item vec)
-        (push (make-array 1 :initial-element item :adjustable T :fill-pointer T) (items inventory))))
+        (vector-push-extend (make-array 1 :initial-element item :adjustable T :fill-pointer T)
+                            (items inventory))))
   item)
 
 (defmethod leave ((item item) (inventory inventory))
   (let ((vec (inv-find-container item inventory)))
     (cond ((= 1 (length vec))
-           (setf (items inventory) (remove vec (items inventory)))
+           (array-utils:vector-pop-position
+            (items inventory)
+            (position vec (items inventory)))
            (when (and (<= 1 (length (items inventory)) (index inventory)))
              (decf (index inventory)))
            item)
@@ -75,7 +78,7 @@
     (with-pushed-matrix
       (gl:translate p (- h p) 0)
       (gl:scale 1 -1 1)
-      (loop for item in (items inventory)
+      (loop for item across (items inventory)
             for i from 0
             do (paint (elt item 0) hud)
                (when (= i (index inventory))
@@ -103,7 +106,7 @@
 
 (defmethod item ((inventory inventory) &optional (index (index inventory)))
   (when (< -1 index (length (items inventory)))
-    (let ((vec (nth index (items inventory))))
+    (let ((vec (elt (items inventory) index)))
       (when vec (elt vec 0)))))
 
 (defmethod remove-item ((inventory inventory) &optional (index (index inventory)))
