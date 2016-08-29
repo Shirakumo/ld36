@@ -17,7 +17,7 @@
   (let ((scene (scene main)))
     (reset scene)
     (enter (make-instance 'ground) scene)
-    (enter (make-instance 'space-axes :size 100) scene)
+    #+:ld36-debug (enter (make-instance 'space-axes :size 100) scene)
     (enter (make-instance 'colleen :inventory '(fireplace plaster stick stick)) scene)
     (enter (make-instance 'following-camera :name :camera
                                             :target (unit :player scene)
