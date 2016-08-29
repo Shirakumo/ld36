@@ -189,8 +189,8 @@
                  (typep item 'collidable))
         (when (close-by colleen item)
           (push item found))))
-    (print (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
-                                                         (location a))))))))
+    (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
+                                                  (location a)))))))
 
 (define-handler (colleen perform) (ev)
   (when (cond
