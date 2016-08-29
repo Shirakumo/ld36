@@ -165,9 +165,9 @@
                  (not (eql item (placing colleen)))
                  (typep item 'collidable))
         (let ((time (collides colleen item)))
-          (when time
-            (push (cons time item) found)))))
-    (mapcar #'cdr (sort found #'< :key #'car))))
+          (when time (push item found)))))
+    (sort found #'< :key (lambda (a) (vlength (v- (location colleen)
+                                                  (location a)))))))
 
 (define-handler (colleen perform) (ev)
   (when (cond
