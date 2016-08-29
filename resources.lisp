@@ -46,7 +46,7 @@
 (define-asset texture flower (:ld36)
   :file "flower.png")
 
-(define-subject flower (resource face-entity)
+(define-subject flower (resource pass-through)
   ()
   (:default-initargs
    :bounds (vec 40 40 20)
@@ -55,7 +55,7 @@
 (define-asset texture grass (:ld36)
   :file "grass.png")
 
-(define-subject grass (resource face-entity)
+(define-subject grass (resource pass-through)
   ()
   (:default-initargs
    :bounds (vec 40 40 20)
@@ -67,7 +67,7 @@
 (define-asset texture bush2 (:ld36)
   :file "bush2.png")
 
-(define-subject bush (resource face-entity)
+(define-subject bush (resource pass-through)
   ()
   (:default-initargs
    :bounds (vec 50 50 20)
@@ -80,7 +80,7 @@
 (define-asset texture tree2 (:ld36)
   :file "tree2.png")
 
-(define-subject tree (resource face-entity)
+(define-subject tree (resource)
   ()
   (:default-initargs
    :bounds (vec 40 150 60)
@@ -96,7 +96,7 @@
 (define-asset texture rock2 (:ld36)
   :file "rock2.png")
 
-(define-subject rock (resource face-entity)
+(define-subject rock (resource)
   ()
   (:default-initargs
    :bounds (vec 60 60 60)
@@ -136,7 +136,7 @@
 (define-asset texture fireplace (:ld36)
   :file "fireplace.png")
 
-(define-subject fireplace (resource face-entity buildable)
+(define-subject fireplace (resource buildable)
   ((burning :initform NIL :accessor burning)
    (part-sys :initform (make-instance 'particle-system :jitter (vec 0.1 0.1 0.1)
                                                        :force (vec 0 0.1 0)) :accessor part-sys))
@@ -217,7 +217,7 @@
 (define-asset texture plaster3 (:ld36)
   :file "plaster3.png")
 
-(define-subject plaster (resource face-entity)
+(define-subject plaster (resource pass-through)
   ()
   (:default-initargs
    :bounds (vec 40 40 40)

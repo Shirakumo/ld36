@@ -9,7 +9,8 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defclass moving-entity (located-entity)
-    ((velocity :initarg :velocity :initform (vec 0 0 0) :accessor velocity))))
+    ((velocity :initarg :velocity :initform (vec 0 0 0) :accessor velocity)))
+  (defclass pass-through () ()))
 
 ;; Not great to make every collidable moving, but simplifies things.
 (define-subject collidable (moving-entity bound-entity pivoted-entity)
