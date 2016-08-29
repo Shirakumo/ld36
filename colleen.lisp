@@ -113,8 +113,8 @@
    :name :player
    :animations '((idle  2.0 20 :texture (:ld36 colleen-idle) :next idle)
                  (walk  0.7 20 :texture (:ld36 colleen-walking) :next walk)
-                 (use   0.7 12 :texture (:ld36 colleen-using) :next idle)
-                 (throw 0.7 12 :texture (:ld36 colleen-throw) :next idle)
+                 (use   0.5 12 :texture (:ld36 colleen-using) :next idle)
+                 (throw 0.5 12 :texture (:ld36 colleen-throw) :next idle)
                  (die   2.0 37 :texture (:ld36 colleen-die)))))
 
 (defmethod initialize-instance :after ((colleen colleen) &key inventory fullness)
@@ -141,7 +141,8 @@
              (clear inventory)
              (setf (animation colleen) 'die)
              (start (unit :gameover *loop*))))
-          (T
+          ((not (or (eql (name (animation colleen)) 'use)
+                    (eql (name (animation colleen)) 'throw)))
            (cond ((retained 'movement :left) (setf facing :left))
                  ((retained 'movement :right) (setf facing :right)))
            
