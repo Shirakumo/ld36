@@ -11,7 +11,8 @@
 
 (define-widget main (QGLWidget trial:main)
   ((started :initform NIL :accessor started))
-  (:default-initargs :clear-color (vec 1 1 1)))
+  (:default-initargs :clear-color (vec 1 1 1)
+                     :title "Cool Gayme"))
 
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
@@ -48,4 +49,4 @@
   (stop-overriding))
 
 (defun launch ()
-  (trial:launch 'main))
+  (trial:launch 'main :application-name "Cool Gayme"))

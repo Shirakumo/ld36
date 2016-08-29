@@ -78,7 +78,7 @@
       (gl:vertex (width hud) (height hud))
       (gl:vertex 0 (height hud)))
     (gl:color 1 1 1 1)
-    (draw-text 10 90 "SUPER GAYME" :color c :font (asset 'font :ld36 'title))
+    (draw-text 10 90 (title (window :main)) :color c :font (asset 'font :ld36 'title))
     (draw-text 10 120 "Try not to starve yourself to death." :color c)
     (draw-text 10 180 "
 
