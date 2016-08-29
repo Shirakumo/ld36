@@ -14,6 +14,9 @@
   (:default-initargs :clear-color (vec 1 1 1)
                      :title "Cool Gayme"))
 
+(define-initializer (main set-resolution)
+  (q+:resize main 1024 786))
+
 (defmethod setup-scene ((main main))
   (let ((scene (scene main)))
     (reset scene)
