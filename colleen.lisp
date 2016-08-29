@@ -156,8 +156,10 @@
       (setf (vy velocity) 0))
 
     (when placing
-      (let ((maybe-loc (v+ location (vec (ecase facing (:left -30) (:right 30)) 0 0))))
-        (setf (location placing) (align maybe-loc (bounds placing)))))))
+      (let ((maybe-loc (v+ location (vec (* (vx (bounds placing)) (ecase facing (:left -1) (:right 1)))
+                                         0 0))))
+        (setf (location placing) (v+ (align maybe-loc (bounds placing))
+                                     (vec 0 5 0)))))))
 
 (defmethod interactables ((colleen colleen))
   (let ((found ()))
