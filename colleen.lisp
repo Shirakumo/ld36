@@ -115,7 +115,7 @@
                  (walk  0.7 20 :texture (:ld36 colleen-walking) :next walk)
                  (use   0.5 12 :texture (:ld36 colleen-using) :next idle)
                  (throw 0.5 12 :texture (:ld36 colleen-throw) :next idle)
-                 (die   2.0 37 :texture (:ld36 colleen-die)))))
+                 (die   4.0 37 :texture (:ld36 colleen-die)))))
 
 (defmethod initialize-instance :after ((colleen colleen) &key inventory fullness)
   (setf (inventory colleen) (make-instance 'inventory :items inventory))
@@ -134,6 +134,13 @@
        (* (round (vy vector) (vy grid)) (vy grid))
        (* (round (vz vector) (vz grid)) (vz grid))))
 
+(defun placing-loc (placing colleen)
+  (let ((maybe-loc (v+ (location colleen)
+                       (vec (* (vx (bounds placing)) (ecase (facing colleen) (:left -1) (:right 1)))
+                            0 0))))
+    (v+ (align maybe-loc (bounds placing))
+        (vec 0 5 0))))
+
 (define-handler (colleen tick) (ev)
   (with-slots (facing velocity location placing stomach inventory) colleen
     (cond ((<= (fullness stomach) 0)
@@ -141,8 +148,9 @@
              (clear inventory)
              (setf (animation colleen) 'die)
              (start (unit :gameover *loop*))))
-          ((not (or (eql (name (animation colleen)) 'use)
-                    (eql (name (animation colleen)) 'throw)))
+          ((and (running *loop*)
+                (not (or (eql (name (animation colleen)) 'use)
+                         (eql (name (animation colleen)) 'throw))))
            (cond ((retained 'movement :left) (setf facing :left))
                  ((retained 'movement :right) (setf facing :right)))
            
@@ -194,13 +202,10 @@
 
            (when (< (vy location) 0)
              (setf (vy location) 0)
-             (setf (vy velocity) 0))
-
-           (when placing
-             (let ((maybe-loc (v+ location (vec (* (vx (bounds placing)) (ecase facing (:left -1) (:right 1)))
-                                                0 0))))
-               (setf (location placing) (v+ (align maybe-loc (bounds placing))
-                                            (vec 0 5 0)))))))))
+             (setf (vy velocity) 0))))
+          
+    (when placing
+      (setf (location placing) (placing-loc placing colleen)))))
 
 (defmethod interactables ((colleen colleen))
   (let ((found ()))
