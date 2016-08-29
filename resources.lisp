@@ -142,6 +142,15 @@
     (setf (burning fireplace) (not (burning fireplace)))
     T))
 
+(defmethod use ((dead-mouse dead-mouse) (fireplace fireplace))
+  (when (built fireplace)
+    (let ((ham (make-instance 'ham)))
+      (enter ham (scene (window :main)))
+      (setf (location ham) (v+ (location fireplace) (vec 0 10 0))
+            (velocity ham) (vec (- (random 8.0) 4)
+                                (random 10.0)
+                                (- (random 4.0) 2.0))))))
+
 (defun random-range (range)
   (- (random (* 2.0 range)) range))
 

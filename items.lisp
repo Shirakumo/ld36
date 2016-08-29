@@ -49,8 +49,16 @@
   (:default-initargs
    :texture '(:ld36 pebble)))
 
+(define-asset texture dead-mouse (:ld36)
+  :file "mouse-idle.png")
+
+(define-subject dead-mouse (item)
+  ()
+  (:default-initargs
+   :texture '(:ld36 dead-mouse)))
+
 (define-asset texture ham (:ld36)
-  :file "bush.png")
+  :file "ham.png")
 
 (define-subject ham (item pass-through)
   ()

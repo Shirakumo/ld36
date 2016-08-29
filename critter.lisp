@@ -7,11 +7,16 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (in-package #:org.shirakumo.fraf.ld36)
 (in-readtable :qtools)
 
-(define-subject critter (item flipping pivoted-entity)
+(define-subject critter (sprite-subject collidable flipping pivoted-entity)
   ((behavior :initform :idle :accessor behavior)
    (previous-location :initform NIL :accessor previous-location)
    (last-moved :initform 0 :accessor last-moved)
-   (target :initform NIL :accessor target)))
+   (target :initform NIL :accessor target))
+  (:default-initargs
+   :location (vec 0 0 0)
+   :hitbox (vec 40 20 20)
+   :bounds (vec 40 20 20)
+   :pivot (vec -20 0 10)))
 
 (defmethod initialize-instance :after ((critter critter) &key pivot bounds)
   (when (and bounds (not pivot))
@@ -24,7 +29,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
     (gl:translate 0 0 (- (vz (pivot critter))))
     (call-next-method)))
 
-(defmethod use ((critter critter) (with entity)))
+(defmethod interact ((critter critter) player))
 
 (define-handler (critter tick) (ev)
   (with-slots (behavior last-moved target previous-location location velocity facing) critter
@@ -79,20 +84,25 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
 (defun normalize (vec)
   (v/ vec (distance vec)))
 
-(define-asset texture mouse (:ld36)
-  :file "flower.png")
+(define-asset texture mouse-idle (:ld36)
+  :file "mouse-idle.png")
+
+(define-asset texture mouse-walking (:ld36)
+  :file "mouse-walking.png")
 
 (define-subject mouse (critter)
   ()
   (:default-initargs
-   :bounds (vec 40 40 20)
-   :texture '(:ld36 mouse)))
+   :animations '((idle 2.0 1 :texture (:ld36 mouse-idle))
+                 (walk 1.4 2 :texture (:ld36 mouse-walking) :next idle))))
 
-(defmethod use ((mouse mouse) (fireplace fireplace))
-  (when (built fireplace)
-    (let ((ham (make-instance 'ham)))
-      (enter ham (scene (window :main)))
-      (setf (location ham) (v+ (location fireplace) (vec 0 10 0))
-            (velocity ham) (vec (- (random 8.0) 4)
-                                (random 10.0)
-                                (- (random 4.0) 2.0))))))
+(defmethod interact ((mouse mouse) player)
+  (leave mouse (scene (window :main)))
+  (enter (make-instance 'dead-mouse) (inventory player)))
+
+(define-handler (mouse mouse-tick tick) (ev)
+  (case (behavior mouse)
+    (:moving
+     (setf (animation mouse) 'walk))
+    (:idle
+      (setf (animation mouse) 'idle))))
