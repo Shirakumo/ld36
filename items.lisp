@@ -54,7 +54,7 @@
    :texture '(:ld36 pebble)))
 
 (define-asset texture dead-mouse (:ld36)
-  :file "mouse-idle.png")
+  :file "mouse-dead.png")
 
 (define-subject dead-mouse (item)
   ()
