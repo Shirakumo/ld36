@@ -127,7 +127,7 @@
                  (T (setf (second cons) (1- count))))
                (return T)))))
 
-(defmethod paint :around ((buildable buildable) target)
+(defmethod paint :around ((buildable buildable) (main main))
   (cond ((built buildable) (call-next-method))
         (T (gl:color 1.0 0.0 0.0)
            (call-next-method)
