@@ -52,12 +52,12 @@
   (gamepad-move (one-of axis :left-v :dpad-v) (< pos 0.2 old-pos)))
 
 (define-action perform (player-action)
-  (mouse-press (one-of button :right))
+  (mouse-release (one-of button :right))
   (key-press (one-of key :space))
   (gamepad-press (eql button :a)))
 
 (define-action use (player-action)
-  (mouse-press (one-of button :left))
+  (mouse-release (one-of button :left))
   (key-press (one-of key :e))
   (gamepad-press (eql button :b)))
 
