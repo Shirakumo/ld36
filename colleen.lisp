@@ -149,6 +149,26 @@
     (when (< 0 (vy location))
       (decf (vy velocity) 0.5))
 
+    (do-container-tree (item *loop*)
+      (when (and (not (eql item colleen))
+                 (not (eql item (placing colleen)))
+                 (typep item 'collidable))
+        (let ((time (collides colleen item)))
+          (when time
+            (let* ((colpos (v+ location (v* velocity time)))
+                   (ll (v+ (location item) (pivot item)))
+                   (rr (v+ ll (bounds item))))
+              (cond ((or (and (<= (abs (- (vx colpos) (vx ll))) 1)
+                              (< 0 (vx velocity)))
+                         (and (<= (abs (- (vx colpos) (vx rr))) 1)
+                              (< (vx velocity) 0)))
+                     (setf (vx velocity) 0))
+                    ((or (and (<= (abs (- (vz colpos) (vz ll))) 1)
+                              (< 0 (vz velocity)))
+                         (and (<= (abs (- (vz colpos) (vz rr))) 1)
+                              (< (vz velocity) 0)))
+                     (setf (vz velocity) 0))))))))
+
     (nv+ location velocity)
 
     (when (< (vy location) 0)
