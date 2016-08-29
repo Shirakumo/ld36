@@ -18,7 +18,7 @@
 
 (defmethod initialize-instance :after ((collidable collidable) &key hitbox bounds)
   (when (and bounds (not hitbox))
-    (setf (hitbox collidable) (vcopy bounds))))
+    (setf (hitbox collidable) (v- bounds 5))))
 
 ;; We only do 2d testing since we don't jump or elevate.
 (defun vec-in-box-p (vec loc ext)
