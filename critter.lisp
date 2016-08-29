@@ -96,7 +96,7 @@ Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.
    (go-home-at :initform (+ 500 (random 1000)) :accessor go-home-at))
   (:default-initargs
    :animations '((idle 2.0 1 :texture (:ld36 mouse-idle) :next idle)
-                 (walk 0.35 3 :texture (:ld36 mouse-walking) :next idle))))
+                 (walk 0.7 2 :texture (:ld36 mouse-walking) :next idle))))
 
 (defmethod initialize-instance :after ((mouse mouse) &key home)
   (setf (home mouse) (v+ (vec 0 0 0) (or home (location mouse)))))
