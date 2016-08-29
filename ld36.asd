@@ -21,6 +21,7 @@
                (:file "items")
                (:file "resources")
                (:file "inventory")
+               (:file "stomach")
                (:file "flipping")
                (:file "colleen")
                (:file "critter"))

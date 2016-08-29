@@ -33,6 +33,10 @@
          (decf (vy (velocity item)) 0.5)
          (nv+ (location item) (velocity item)))))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defclass food ()
+    ((food-value :initarg :food-value :initform 0.1 :accessor food-value))))
+
 (define-asset texture stick (:ld36)
   :file "stick.png")
 
@@ -60,7 +64,7 @@
 (define-asset texture ham (:ld36)
   :file "ham.png")
 
-(define-subject ham (item pass-through)
+(define-subject ham (item food pass-through)
   ()
   (:default-initargs
    :texture '(:ld36 ham)))

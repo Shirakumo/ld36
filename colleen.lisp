@@ -100,7 +100,8 @@
 
 (define-subject colleen (sprite-subject collidable flipping pivoted-entity)
   ((inventory :initform NIL :accessor inventory)
-   (placing :initform NIL :accessor placing))
+   (placing :initform NIL :accessor placing)
+   (stomach :initform NIL :accessor stomach))
   (:default-initargs
    :location (vec 0 0 0)
    :hitbox (vec 50 80 20)
@@ -112,14 +113,17 @@
                  (use   0.7 12 :texture (:ld36 colleen-using) :next idle)
                  (throw 0.7 12 :texture (:ld36 colleen-throw) :next idle))))
 
-(defmethod initialize-instance :after ((colleen colleen) &key inventory)
-  (setf (inventory colleen) (make-instance 'inventory :items inventory)))
+(defmethod initialize-instance :after ((colleen colleen) &key inventory fullness)
+  (setf (inventory colleen) (make-instance 'inventory :items inventory))
+  (setf (stomach colleen) (make-instance 'stomach :fullness (or fullness 1.0))))
 
 (defmethod enter :after ((colleen colleen) (scene scene))
-  (enter (inventory colleen) scene))
+  (enter (inventory colleen) scene)
+  (enter (stomach colleen) scene))
 
 (defmethod leave :after ((colleen colleen) (scene scene))
-  (leave (inventory colleen) scene))
+  (leave (inventory colleen) scene)
+  (leave (stomach colleen) scene))
 
 (defun align (vector grid)
   (vec (* (round (vx vector) (vx grid)) (vx grid))
@@ -250,3 +254,7 @@
       (enter resource (scene (window :main)))
       (setf (placing colleen) resource))
     T))
+
+(defmethod use ((food food) (colleen colleen))
+  (eat food (stomach colleen))
+  T)
