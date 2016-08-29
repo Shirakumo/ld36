@@ -236,7 +236,8 @@
   ((spawn-chance :initarg :spawn-chance :initform 0.005 :accessor spawn-chance)
    (gone :initform 0 :accessor gone)
    (live :initform 0 :accessor live)
-   (spawn-max :initform (+ 1 (random 10)) :accessor spawn-max))
+   (spawn-max :initform (+ 1 (random 10)) :accessor spawn-max)
+   (tunnels :initarg :tunnels :accessor tunnels))
   (:default-initargs
    :bounds (vec 40 40 40)
    :texture '(:ld36 mouse-hole)))
@@ -250,6 +251,49 @@
                                    :home mouse-hole) *loop*))
     (when (<= spawn-max gone)
       (leave mouse-hole (scene (window :main))))))
+
+(defmethod leave :after ((mouse-hole mouse-hole) (scene scene))
+  (add-hole (tunnels mouse-hole)))
+
+(define-subject mouse-tunnels ()
+  ((noise-map :initform NIL :accessor noise-map)
+   (filter-locations :initarg :filter-locations :accessor filter-locations)
+   (location-queue :initform NIL :accessor location-queue)
+   (new-locations :initform NIL :accessor new-locations)
+   (old-locations :initform NIL :accessor old-locations)
+   (hole-count :initarg :hole-count :accessor hole-count))
+  (:default-initargs
+   :hole-count 100))
+
+(defmethod initialize-instance :after ((tunnels mouse-tunnels) &key (width 2000)
+                                                                    (height 2000))
+  (setf (noise-map tunnels) (make-instance 'noise-map :width width :height height)))
+
+(defmethod enter :after ((tunnels mouse-tunnels) (scene scene))
+  (let ((locations (locations (noise-map tunnels) '(210 50)
+                              :cluster-size 3
+                              :filter-locations (filter-locations tunnels))))
+    (for:for ((loc in locations)
+              (i repeat (hole-count tunnels)))
+      (until (<= (hole-count tunnels) i))
+      (enter (make-instance 'mouse-hole :location (vec (car loc) 0 (cdr loc))
+                                        :tunnels tunnels) *loop*))
+    (setf (old-locations tunnels) locations)))
+
+(defmethod add-hole ((tunnels mouse-tunnels))
+  (with-slots (location-queue new-locations old-locations hole-count noise-map filter-locations) tunnels
+    (unless location-queue
+      (setf (location-queue tunnels) (locations noise-map '(210 50)
+                                                :cluster-size 3
+                                                :filter-locations (append old-locations filter-locations new-locations))))
+    (let* ((loc (pop (location-queue tunnels)))
+           (new-hole (make-instance 'mouse-hole :location (vec (car loc) 0 (cdr loc))
+                                                :tunnels tunnels)))
+      (push loc (new-locations tunnels))
+      (enter new-hole *loop*))
+    (unless location-queue
+      (setf (old-locations tunnels) new-locations
+            (new-locations tunnels) NIL))))
 
 (define-asset texture ground (:ld36)
   :file "ground.png"

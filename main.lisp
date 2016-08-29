@@ -27,9 +27,7 @@
                                                               :height 2000)
                                                scene
                                                '(tree bush rock flower grass))))
-      (populate-scene (make-instance 'noise-map :width 2000 :height 2000)
-                      scene '(mouse-hole) :filter-locations populated-locations
-                                          :zones '(210 50) :cluster-size 3))
+      (enter (make-instance 'mouse-tunnels :filter-locations populated-locations) scene))
     (enter (make-instance 'gameover :name :gameover) scene)))
 
 (define-override (main focus-in-event) (ev)
