@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>
 |#
 
-(in-package #:cl-user)
+
 (asdf:defsystem ld36
   :version "1.0.0"
   :license "Artistic"
