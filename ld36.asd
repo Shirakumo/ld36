@@ -7,7 +7,7 @@
 
 (asdf:defsystem ld36
   :version "1.0.0"
-  :license "Artistic"
+  :license "zlib"
   :author "Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
   :description "Entry for the Ludum Dare 36"
