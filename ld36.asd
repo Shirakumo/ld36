@@ -1,17 +1,17 @@
 #|
  This file is a part of ld36
  (c) 2016 Shirakumo http://tymoon.eu (shinmera@tymoon.eu)
- Author: Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>
+ Author: Yukari Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>
 |#
 
 
 (asdf:defsystem ld36
   :version "1.0.0"
   :license "zlib"
-  :author "Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
-  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
+  :author "Yukari Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
+  :maintainer "Yukari Hafner <shinmera@tymoon.eu>, Janne Pakarinen <gingeralesy@gmail.com>"
   :description "Entry for the Ludum Dare 36"
-  :homepage "https://github.com/Shirakumo/ld36"
+  :homepage "https://shirakumo.org/project/ld36"
   :serial T
   :defsystem-depends-on (:qtools)
   :components ((:file "package")
